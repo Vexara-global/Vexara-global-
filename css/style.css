@@ -527,3 +527,10 @@ footer {
   color: var(--text-primary) !important;
   margin: 12px 0;
 }
+.check-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
