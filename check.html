@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Check My Contract — Vexara Global</title>
+  <title>Check Your Contract Status — Vexara Global</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
@@ -18,7 +18,7 @@
         </div>
         <ul class="nav-menu" id="navMenu">
           <li><a href="index.html">Home</a></li>
-          <li><a href="check.html">Check My Contract</a></li>
+          <li><a href="check.html" class="active">Check My Contract</a></li>
           <li><a href="index.html#contact">Contact</a></li>
         </ul>
       </div>
@@ -26,22 +26,30 @@
   </header>
 
   <main class="container">
-    <section class="hero">
-      <h1>Check Your Contract Status</h1>
-      <p>Enter the unique reference you received after submitting your request.</p>
+    <section class="hero check-hero">
+      <div class="check-card">
+        <h1>Check Your Contract Status</h1>
+        <p>Enter the unique reference you received after submitting your request.</p>
+
+        <form id="checkForm" class="check-form">
+          <input 
+            type="text" 
+            id="reference" 
+            placeholder="Contract Reference (e.g. VX-2026-789)" 
+            autocomplete="off"
+            required 
+          />
+          <button type="submit" class="btn primary">Verify</button>
+        </form>
+
+        <div id="result" class="result-box"></div>
+      </div>
     </section>
-
-    <form id="checkForm" class="contract-check-form">
-      <input type="text" id="reference" placeholder="Contract Reference (e.g. VX-2026-789)" required />
-      <button type="submit">Verify</button>
-    </form>
-
-    <div id="result" class="result-box"></div>
   </main>
 
   <footer>
     <div class="container">
-      &copy; 2023 Vexara Global
+      &copy; 2026 Vexara Global — Track your international opportunity with confidence.
     </div>
   </footer>
 
@@ -51,11 +59,26 @@
       const ref = document.getElementById('reference').value.trim().toUpperCase();
       const resultDiv = document.getElementById('result');
       
-      // Simulated response (replace later with real API call)
+      // ⚠️ À remplacer plus tard par une vraie API (Neon + Netlify Functions)
       if (ref === 'VX-2026-001') {
-        resultDiv.innerHTML = `<p class="success">✅ Contract found!<br>Type: Internship in Berlin<br>Status: Confirmed</p>`;
+        resultDiv.innerHTML = `
+          <div class="status-success">
+            <strong>✅ Contract Found</strong><br>
+            Type: International Internship<br>
+            Location: Berlin, Germany<br>
+            Status: Confirmed — Ready for next steps
+          </div>
+        `;
+      } else if (ref === '') {
+        resultDiv.innerHTML = `<p class="error">Please enter a reference.</p>`;
       } else {
-        resultDiv.innerHTML = `<p class="error">❌ Reference not found. Please check your input.</p>`;
+        resultDiv.innerHTML = `
+          <div class="status-error">
+            <strong>❌ Reference Not Found</strong><br>
+            Double-check your reference code.<br>
+            Still missing it? <a href="index.html#contact">Contact us</a>.
+          </div>
+        `;
       }
     });
   </script>
