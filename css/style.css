@@ -372,3 +372,114 @@ footer {
   color: inherit;
   text-decoration: underline;
 }
+/* ====================== */
+/* DARK MODE SUPPORT      */
+/* ====================== */
+
+:root {
+  --bg-primary: #ffffff;
+  --text-primary: #0f172a;
+  --card-bg: #ffffff;
+  --input-bg: #ffffff;
+  --border-color: #e2e8f0;
+}
+
+[data-theme="dark"] {
+  --bg-primary: #0f172a;
+  --text-primary: #f1f5f9;
+  --card-bg: #1e293b;
+  --input-bg: #334155;
+  --border-color: #475569;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+header {
+  background-color: var(--bg-primary);
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.logo,
+.nav-menu a {
+  color: var(--text-primary);
+  transition: color 0.3s;
+}
+
+.hero,
+.values,
+.form-section,
+.check-card,
+footer {
+  background-color: var(--bg-primary);
+  transition: background-color 0.3s;
+}
+
+.contact-form,
+.check-card {
+  background-color: var(--card-bg);
+  transition: background-color 0.3s;}
+
+.contact-form input,
+.contact-form select,
+.contact-form textarea,
+.check-form input {
+  background-color: var(--input-bg);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+  transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+}
+
+.result-box .status-success {
+  background: #0c4a35;
+  border-color: #065f46;
+  color: #d1fae5;
+}
+
+.result-box .status-error {
+  background: #450a0a;
+  border-color: #991b1b;
+  color: #fecaca;
+}
+
+/* Dark mode toggle button */
+.theme-toggle {
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 1.3rem;
+  cursor: pointer;
+  margin-left: 15px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.3s;
+}
+
+.theme-toggle:hover {
+  background-color: var(--border-color);
+}
+
+/* ====================== */
+/* ANIMATIONS             */
+/* ====================== */
+
+@keyframes fadeInUp {  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.result-box.show {
+  animation: fadeInUp 0.4s ease-out;
+}
