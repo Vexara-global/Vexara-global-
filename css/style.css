@@ -483,3 +483,19 @@ footer {
 .result-box.show {
   animation: fadeInUp 0.4s ease-out;
 }
+/* --- FIX: Texte dans les cartes (values section) en dark mode --- */
+[data-theme="dark"] .card h3,
+[data-theme="dark"] .card p {
+  color: var(--text-primary);
+}
+
+/* --- FIX: Icônes & symboles (emojis) en dark mode --- */
+[data-theme="dark"] .trust-badges span,
+[data-theme="dark"] .card h3::before {
+  color: #cbd5e1; /* gris clair lisible sur fond sombre */
+}
+
+/* --- FIX: Menu burger (trois traits) en dark mode --- */
+[data-theme="dark"] .menu-toggle span {
+  background: var(--text-primary) !important;
+}
