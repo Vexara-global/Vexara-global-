@@ -546,3 +546,44 @@ footer {
 [data-theme="dark"] .nav-menu a:hover {
   color: var(--primary); /* bleu clair au survol */
 }
+/* --- FIX: Hero text in dark mode --- */
+[data-theme="dark"] .hero-content h1,
+[data-theme="dark"] .hero-content .subtitle,
+[data-theme="dark"] .hero-content .trust-badges span {
+  color: var(--text-primary) !important;
+}
+
+/* --- FIX: Form labels & placeholders in dark mode --- */
+.contact-form input::placeholder,
+.contact-form select::placeholder,
+.file-label span {
+  color: var(--gray) !important;
+}
+
+[data-theme="dark"] .contact-form input::placeholder,
+[data-theme="dark"] .contact-form select::placeholder,
+[data-theme="dark"] .file-label span {
+  color: #94a3b8 !important; /* gris clair lisible sur fond sombre */
+}
+
+/* --- Force visibility of dropdowns in dark mode --- */
+[data-theme="dark"] .contact-form select {
+  background: var(--card-bg);
+  color: var(--text-primary);
+}
+
+/* --- Bonus: Make the "Date of Birth" field more explicit on desktop (optional) --- */
+input[type="date"] {
+  position: relative;
+}
+input[type="date"]::before {
+  content: "Date of Birth";
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.85rem;
+  color: var(--gray);
+  pointer-events: none;
+  opacity: 0.7;
+}
