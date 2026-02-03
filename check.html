@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Check My Contract — Vexara Global</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="header-content">
+        <div class="logo">Vexara Global</div>
+        <div class="menu-toggle" id="menuToggle">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <ul class="nav-menu" id="navMenu">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="check.html">Check My Contract</a></li>
+          <li><a href="index.html#contact">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <h1>Check Your Contract Status</h1>
+      <p>Enter the unique reference you received after submitting your request.</p>
+    </section>
+
+    <form id="checkForm" class="contract-check-form">
+      <input type="text" id="reference" placeholder="Contract Reference (e.g. VX-2026-789)" required />
+      <button type="submit">Verify</button>
+    </form>
+
+    <div id="result" class="result-box"></div>
+  </main>
+
+  <footer>
+    <div class="container">
+      &copy; 2023 Vexara Global
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('checkForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const ref = document.getElementById('reference').value.trim().toUpperCase();
+      const resultDiv = document.getElementById('result');
+      
+      // Simulated response (replace later with real API call)
+      if (ref === 'VX-2026-001') {
+        resultDiv.innerHTML = `<p class="success">✅ Contract found!<br>Type: Internship in Berlin<br>Status: Confirmed</p>`;
+      } else {
+        resultDiv.innerHTML = `<p class="error">❌ Reference not found. Please check your input.</p>`;
+      }
+    });
+  </script>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

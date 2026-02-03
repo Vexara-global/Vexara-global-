@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Vexara Global — International job, internship & language stay platform in 90+ countries. No registration required. Track your application by reference." />
+  <title>Vexara Global | International Opportunities Without Registration</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>V</text></svg>">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="header-content">
+        <div class="logo">Vexara Global</div>
+        <div class="menu-toggle" id="menuToggle">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <ul class="nav-menu" id="navMenu">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="check.html">Check My Contract</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container hero-content">
+      <h1>International Opportunities.<br/>No Compromises.</h1>
+      <p class="subtitle">
+        Find jobs (CDD/CDI), internships, or language stays in <strong>90+ countries</strong> — <em>no account needed</em>, no hidden steps, with secure tracking.
+      </p>
+      <div class="trust-badges">
+        <span>🔒 Unique reference tracking</span>
+        <span>🌍 Active in 90+ countries</span>
+        <span>📧 Response within 48h</span>
+      </div>
+      <a href="#apply" class="btn primary">Submit Your Request</a>
+    </div>
+  </section>
+
+  <section class="values">
+    <div class="container">
+      <h2>Why thousands of candidates trust us</h2>
+      <div class="cards">
+        <div class="card">
+          <h3>✅ Full Transparency</h3>          <p>No hidden sign-ups. Submit once, get a reference, and track your application securely.</p>
+        </div>
+        <div class="card">
+          <h3>🛡️ Data Security</h3>
+          <p>Your information is protected. Only your unique reference grants access to your file.</p>
+        </div>
+        <div class="card">
+          <h3>🚀 Global Access</h3>
+          <p>Verified opportunities across Europe, the Americas, Asia, Africa, and Oceania.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="apply" class="form-section">
+    <div class="container">
+      <h2>Submit your request in 60 seconds</h2>
+      <p class="form-note">You’ll receive a unique tracking reference by email within 48 hours.</p>
+      
+      <form name="contact" method="POST" data-netlify="true" class="contact-form">
+        <input type="hidden" name="form-name" value="contact" />
+        
+        <div class="form-row">
+          <input type="text" name="full_name" placeholder="Full Name *" required />
+          <input type="email" name="email" placeholder="Professional Email *" required />
+        </div>
+        
+        <select name="request_type" required>
+          <option value="">-- Request Type * --</option>
+          <option value="permanent-job">Permanent Job (CDI)</option>
+          <option value="fixed-term-job">Fixed-Term Job (CDD)</option>
+          <option value="internship">International Internship</option>
+          <option value="language-stay">Language Stay Program</option>
+        </select>
+        
+        <textarea name="message" placeholder="Describe your profile, target countries, field, experience, etc. *" rows="5" required></textarea>
+        
+        <button type="submit" class="btn large">Send My Request</button>
+      </form>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2023 Vexara Global — International platform for professional and educational opportunities.</p>
+      <p style="font-size: 0.9em; opacity: 0.8;">No registration required • Unique tracking reference provided after submission</p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script></body>
+</html>

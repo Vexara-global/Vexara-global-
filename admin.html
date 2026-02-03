@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel — Vexara Global</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="logo">🔒 Admin Panel</div>
+    </div>
+  </header>
+
+  <main class="container">
+    <h1>Manage Offers</h1>
+    <p>Add, edit, or remove job/internship/language stay offers.</p>
+
+    <form id="offerForm">
+      <input type="text" id="offerRef" placeholder="Reference (e.g. VX-2026-123)" required />
+      <select id="offerType" required>
+        <option value="job">Permanent/Fixed-Term Job</option>
+        <option value="internship">Internship</option>
+        <option value="language">Language Stay</option>
+      </select>
+      <input type="text" id="offerTitle" placeholder="Offer Title" required />
+      <textarea id="offerDesc" placeholder="Description" rows="4" required></textarea>
+      <button type="submit">Save Offer</button>
+    </form>
+
+    <div id="offersList" style="margin-top: 30px;">
+      <h3>Current Offers (Local Storage)</h3>
+      <ul id="offers"></ul>
+    </div>
+  </main>
+
+  <script>
+    let offers = JSON.parse(localStorage.getItem('vexara_offers') || '[]');
+
+    function saveOffers() {
+      localStorage.setItem('vexara_offers', JSON.stringify(offers));
+      renderOffers();
+    }
+
+    function renderOffers() {
+      const list = document.getElementById('offers');
+      if (offers.length === 0) {
+        list.innerHTML = '<p>No offers yet.</p>';
+        return;
+      }
+      list.innerHTML = offers.map((o, i) => 
+        `<li><strong>${o.ref}</strong> – ${o.title} <button onclick="deleteOffer(${i})" style="margin-left:10px;color:#e74c3c;">Delete</button></li>`
+      ).join('');
+    }
+
+    function deleteOffer(index) {
+      offers.splice(index, 1);
+      saveOffers();
+    }
+
+    document.getElementById('offerForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const newOffer = {
+        ref: document.getElementById('offerRef').value,
+        type: document.getElementById('offerType').value,
+        title: document.getElementById('offerTitle').value,
+        desc: document.getElementById('offerDesc').value
+      };
+      offers.push(newOffer);
+      saveOffers();
+      this.reset();
+    });
+
+    renderOffers();
+  </script>
+</body>
+</html>
