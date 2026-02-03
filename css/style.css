@@ -287,3 +287,88 @@ footer {
     flex-direction: column;
   }
 }
+/* --- CHECK PAGE SPECIFIC --- */
+.check-hero {
+  padding: 60px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.check-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
+  padding: 40px;
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+}
+
+.check-card h1 {
+  font-size: 2.1rem;
+  margin-bottom: 16px;
+  color: var(--secondary);
+}
+
+.check-card p {
+  color: var(--gray);
+  margin-bottom: 30px;
+  font-size: 1.1rem;
+}
+
+.check-form {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.check-form input {
+  flex: 1;
+  padding: 16px 20px;
+  font-size: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  outline: none;
+}
+
+.check-form input:focus {
+  border-color: var(--primary);
+}
+
+.check-form button {
+  padding: 16px 28px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.result-box {
+  margin-top: 24px;
+  text-align: left;
+  font-size: 0.95rem;
+}
+
+.status-success,
+.status-error {
+  padding: 20px;
+  border-radius: 8px;
+  line-height: 1.5;
+}
+
+.status-success {
+  background: #f0fdf4;
+  color: #065f46;
+  border: 1px solid #dcfce7;
+}
+
+.status-error {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fee2e2;
+}
+
+.status-success a,
+.status-error a {
+  color: inherit;
+  text-decoration: underline;
+}
