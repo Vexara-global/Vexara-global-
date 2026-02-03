@@ -534,3 +534,15 @@ footer {
   gap: 12px;
   width: 100%;
 }
+/* --- FIX: Menu mobile en dark mode --- */
+[data-theme="dark"] .nav-menu {
+  background: var(--card-bg); /* #1e293b */
+}
+
+[data-theme="dark"] .nav-menu a {
+  color: var(--text-primary); /* blanc/gris clair */
+}
+
+[data-theme="dark"] .nav-menu a:hover {
+  color: var(--primary); /* bleu clair au survol */
+}
