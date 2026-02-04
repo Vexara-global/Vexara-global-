@@ -55,33 +55,50 @@
   </footer>
 
   <script>
-    document.getElementById('checkForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const ref = document.getElementById('reference').value.trim().toUpperCase();
-      const resultDiv = document.getElementById('result');
-      
-      // ⚠️ À remplacer plus tard par une vraie API (Neon + Netlify Functions)
-      if (ref === 'VX-2026-001') {
+  document.getElementById('checkForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const ref = document.getElementById('reference').value.trim().toUpperCase();
+    const resultDiv = document.getElementById('result');
+    
+    if (!ref) {
+      resultDiv.innerHTML = `<p class="error">Please enter a reference.</p>`;
+      return;
+    }
+
+    resultDiv.innerHTML = '<p style="color:var(--gray);">Checking...</p>';
+
+    try {
+      const response = await fetch(`/.netlify/functions/check-contract?reference=${encodeURIComponent(ref)}`);
+      const data = await response.json();
+
+      if (response.ok) {
+        let statusText = '';
+        if (data.status === 'validated') statusText = '✅ Confirmed';
+        else if (data.status === 'pending') statusText = '⏳ Pending';
+        else if (data.status === 'expired') statusText = '❌ Expired';
+
         resultDiv.innerHTML = `
           <div class="status-success">
-            <strong>✅ Contract Found</strong><br>
-            Type: International Internship<br>
-            Location: Berlin, Germany<br>
-            Status: Confirmed — Ready for next steps
+            <strong>Contract Found</strong><br>
+            Reference: ${data.reference}<br>
+            Type: ${data.type}<br>
+            Status: ${statusText}
           </div>
         `;
-      } else if (ref === '') {
-        resultDiv.innerHTML = `<p class="error">Please enter a reference.</p>`;
       } else {
         resultDiv.innerHTML = `
           <div class="status-error">
             <strong>❌ Reference Not Found</strong><br>
-            Double-check your reference code.<br>
+            Double-check your code.<br>
             Still missing it? <a href="index.html#contact">Contact us</a>.
           </div>
         `;
       }
-    });
+    } catch (err) {
+      console.error(err);
+      resultDiv.innerHTML = `<p class="error">Network error. Please try again.</p>`;
+    }
+  });
   </script>
 
   <script src="js/main.js"></script>
