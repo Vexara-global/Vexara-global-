@@ -2,78 +2,111 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="robots" content="noindex, nofollow" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Admin Panel — Vexara Global</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Admin — Vexara Global</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
   <header>
     <div class="container">
-      <div class="logo">🔒 Admin Panel</div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div class="logo">🔒 Admin Panel</div>
+        <button class="theme-toggle" id="themeToggle">☀️</button>
+      </div>
     </div>
   </header>
 
-  <main class="container">
-    <h1>Manage Offers</h1>
-    <p>Add, edit, or remove job/internship/language stay offers.</p>
+  <main class="container" style="padding: 40px 0;">
+    <div id="login-screen">
+      <h2>Admin Login</h2>
+      <form id="loginForm" style="max-width: 400px; margin: 20px auto;">
+        <input type="password" id="adminPass" placeholder="Password" required style="width:100%; padding:12px; margin:10px 0; border:1px solid var(--border-color); border-radius:6px;" />
+        <button type="submit" class="btn">Login</button>
+        <p id="login-error" style="color:var(--error); margin-top:10px; display:none;">Invalid password</p>
+      </form>
+    </div>
 
-    <form id="offerForm">
-      <input type="text" id="offerRef" placeholder="Reference (e.g. VX-2026-123)" required />
-      <select id="offerType" required>
-        <option value="job">Permanent/Fixed-Term Job</option>
-        <option value="internship">Internship</option>
-        <option value="language">Language Stay</option>
-      </select>
-      <input type="text" id="offerTitle" placeholder="Offer Title" required />
-      <textarea id="offerDesc" placeholder="Description" rows="4" required></textarea>
-      <button type="submit">Save Offer</button>
-    </form>
+    <div id="admin-panel" style="display:none;">
+      <h2>Create New Contract Reference</h2>
+      <form id="contractForm" style="max-width: 600px; margin: 20px auto;">
+        <input type="text" id="clientName" placeholder="Client Full Name *" required />
+        <input type="email" id="clientEmail" placeholder="Client Email *" required />
+        <select id="requestType" required>
+          <option value="">-- Type *</option>
+          <option value="job">Job</option>
+          <option value="internship">Internship</option>
+          <option value="language-stay">Language Stay</option>
+        </select>
+        <select id="status" required>
+          <option value="pending">En attente</option>
+          <option value="validated">Validé</option>
+          <option value="expired">Expiré</option>
+        </select>
+        <div class="file-upload">
+          <label class="file-label">
+            <span>📄 Upload Contract (PDF)</span>
+            <input type="file" id="contractFile" accept=".pdf" required />
+          </label>          <div id="contract-preview" style="margin-top:8px;font-size:0.9rem;color:var(--gray);"></div>
+        </div>
+        <button type="submit" class="btn primary">Generate Reference</button>
+      </form>
 
-    <div id="offersList" style="margin-top: 30px;">
-      <h3>Current Offers (Local Storage)</h3>
-      <ul id="offers"></ul>
+      <div id="result" style="margin-top: 30px; padding: 15px; border-radius: 8px;"></div>
     </div>
   </main>
 
   <script>
-    let offers = JSON.parse(localStorage.getItem('vexara_offers') || '[]');
-
-    function saveOffers() {
-      localStorage.setItem('vexara_offers', JSON.stringify(offers));
-      renderOffers();
-    }
-
-    function renderOffers() {
-      const list = document.getElementById('offers');
-      if (offers.length === 0) {
-        list.innerHTML = '<p>No offers yet.</p>';
-        return;
-      }
-      list.innerHTML = offers.map((o, i) => 
-        `<li><strong>${o.ref}</strong> – ${o.title} <button onclick="deleteOffer(${i})" style="margin-left:10px;color:#e74c3c;">Delete</button></li>`
-      ).join('');
-    }
-
-    function deleteOffer(index) {
-      offers.splice(index, 1);
-      saveOffers();
-    }
-
-    document.getElementById('offerForm').addEventListener('submit', function(e) {
+    // Simple login (password from env)
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const newOffer = {
-        ref: document.getElementById('offerRef').value,
-        type: document.getElementById('offerType').value,
-        title: document.getElementById('offerTitle').value,
-        desc: document.getElementById('offerDesc').value
-      };
-      offers.push(newOffer);
-      saveOffers();
-      this.reset();
+      const pass = document.getElementById('adminPass').value;
+      const res = await fetch('/.netlify/functions/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: pass })
+      });
+      if (res.ok) {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('admin-panel').style.display = 'block';
+      } else {
+        document.getElementById('login-error').style.display = 'block';
+      }
     });
 
-    renderOffers();
+    // File preview for contract
+    document.getElementById('contractFile').addEventListener('change', function() {
+      const preview = document.getElementById('contract-preview');
+      if (this.files[0]) {
+        preview.innerHTML = `📄 ${this.files[0].name}`;
+      }
+    });
+
+    // Submit new contract
+    document.getElementById('contractForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData();
+      formData.append('clientName', document.getElementById('clientName').value);
+      formData.append('clientEmail', document.getElementById('clientEmail').value);
+      formData.append('requestType', document.getElementById('requestType').value);
+      formData.append('status', document.getElementById('status').value);
+      formData.append('contractFile', document.getElementById('contractFile').files[0]);
+
+      const res = await fetch('/.netlify/functions/create-contract', {
+        method: 'POST',
+        body: formData
+      });
+      const resultDiv = document.getElementById('result');
+      if (res.ok) {
+        const data = await res.json();
+        resultDiv.innerHTML = `<p style="color:var(--success);">✅ Reference created: <strong>${data.reference}</strong></p>`;
+        document.getElementById('contractForm').reset();
+        document.getElementById('contract-preview').innerHTML = '';
+      } else {
+        resultDiv.innerHTML = `<p style="color:var(--error);">❌ Error: ${await res.text()}</p>`;
+      }
+    });
   </script>
+  <script src="js/main.js"></script>
 </body>
 </html>
