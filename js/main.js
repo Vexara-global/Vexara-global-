@@ -65,17 +65,27 @@ document.addEventListener('DOMContentLoaded', () => {
       };
     }
   }
-  // === FILE UPLOAD: Show filename after selection ===
+  // === FILE UPLOAD: Show filename + delete button ===
 const fileInput = document.querySelector('input[name="diploma"]');
-const fileNameSpan = document.getElementById('file-name');
+const filePreview = document.getElementById('file-preview');
 
-if (fileInput && fileNameSpan) {
+if (fileInput && filePreview) {
   fileInput.addEventListener('change', function() {
     if (this.files && this.files[0]) {
       const fileName = this.files[0].name;
-      fileNameSpan.innerHTML = `<span style="color: var(--text-primary);">✅ ${fileName}</span>`;
+      filePreview.innerHTML = `
+        <span style="color: var(--text-primary);">✅ ${fileName}</span>
+        <button type="button" id="clear-file" style="
+          background: none; border: none; color: var(--error); 
+          cursor: pointer; font-size: 1.2rem; padding: 0; line-height: 1;"
+        >🗑️</button>
+      `;
+      document.getElementById('clear-file').addEventListener('click', () => {
+        fileInput.value = '';
+        filePreview.innerHTML = '';
+      });
     } else {
-      fileNameSpan.innerHTML = '';
+      filePreview.innerHTML = '';
     }
   });
 }
