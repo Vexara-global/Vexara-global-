@@ -1,0 +1,9 @@
+{
+  "name": "vexara-global",
+  "version": "1.0.0",
+  "description": "International job platform",
+  "type": "commonjs",
+  "dependencies": {
+    "pg": "^8.11.3"
+  }
+}
