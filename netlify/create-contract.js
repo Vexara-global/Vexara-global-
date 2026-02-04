@@ -10,6 +10,7 @@ const pool = new Pool({
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method not allowed' };
+    console.log('DB URL:', process.env.DATABASE_URL);
   }
 
   try {
