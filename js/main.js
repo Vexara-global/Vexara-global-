@@ -65,4 +65,18 @@ document.addEventListener('DOMContentLoaded', () => {
       };
     }
   }
+  // === FILE UPLOAD: Show filename after selection ===
+const fileInput = document.querySelector('input[name="diploma"]');
+const fileNameSpan = document.getElementById('file-name');
+
+if (fileInput && fileNameSpan) {
+  fileInput.addEventListener('change', function() {
+    if (this.files && this.files[0]) {
+      const fileName = this.files[0].name;
+      fileNameSpan.innerHTML = `<span style="color: var(--text-primary);">✅ ${fileName}</span>`;
+    } else {
+      fileNameSpan.innerHTML = '';
+    }
+  });
+}
 });
