@@ -1,6 +1,5 @@
 // netlify/functions/create-contract.js
 const { Pool } = require('pg');
-const crypto = require('crypto');
 
 // Neon connection
 const pool = new Pool({
@@ -8,47 +7,50 @@ const pool = new Pool({
 });
 
 exports.handler = async (event) => {
+  console.log('DB URL loaded:', !!process.env.DATABASE_URL); // ✅ Vérifie que l'URL est chargée
+
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method not allowed' };
-    console.log('DB URL:', process.env.DATABASE_URL);
   }
 
   try {
-    const formData = event.multiValueHeaders['content-type']?.[0]?.includes('multipart/form-data')
-      ? parseMultipart(event)
-      : JSON.parse(event.body);
+    // Parse les données du formulaire HTML (application/x-www-form-urlencoded)
+    const params = new URLSearchParams(event.body);
+    const formData = {
+      clientName: params.get('clientName'),
+      clientEmail: params.get('clientEmail'),
+      requestType: params.get('requestType'),
+      status: params.get('status')
+    };
 
-    // Generate unique reference: VX-2026-XXXX
-    const ref = `VX-2026-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+    // Validation basique
+    if (!formData.clientName || !formData.clientEmail || !formData.requestType || !formData.status) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Missing required fields" })
+      };
+    }
 
-    // Save to Neon DB
+    // Génère une référence unique : VX-2026-XXXXXX
+    const randomPart = Math.random().toString(36).substring(2, 8).toUpperCase();
+    const ref = `VX-2026-${randomPart}`;
+
+    // Sauvegarde dans Neon DB
     await pool.query(
       `INSERT INTO contracts (reference, client_name, client_email, type, status, created_at)
        VALUES ($1, $2, $3, $4, $5, NOW())`,
       [ref, formData.clientName, formData.clientEmail, formData.requestType, formData.status]
     );
 
-    // TODO: Save file to storage (e.g., AWS S3, but for now just return ref)
     return {
       statusCode: 200,
       body: JSON.stringify({ reference: ref })
     };
   } catch (err) {
-    console.error(err);
+    console.error('Database error:', err);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Failed to create contract" })
+      body: JSON.stringify({ error: "Failed to create contract", details: err.message })
     };
   }
 };
-
-// Simplified multipart parser (for demo)
-function parseMultipart(event) {
-  // In production, use a proper library like busboy
-  return {
-    clientName: 'Demo',
-    clientEmail: 'demo@example.com',
-    requestType: 'job',
-    status: 'pending'
-  };
-}
