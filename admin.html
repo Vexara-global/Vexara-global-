@@ -18,95 +18,218 @@
   </header>
 
   <main class="container" style="padding: 40px 0;">
+    <!-- LOGIN -->
     <div id="login-screen">
       <h2>Admin Login</h2>
       <form id="loginForm" style="max-width: 400px; margin: 20px auto;">
-        <input type="password" id="adminPass" placeholder="Password" required style="width:100%; padding:12px; margin:10px 0; border:1px solid var(--border-color); border-radius:6px;" />
+        <input type="password" id="adminPass" placeholder="Password" required 
+               style="width:100%; padding:12px; margin:10px 0; border:1px solid var(--border-color); border-radius:6px;" />
         <button type="submit" class="btn">Login</button>
         <p id="login-error" style="color:var(--error); margin-top:10px; display:none;">Invalid password</p>
       </form>
     </div>
 
+    <!-- ADMIN PANEL -->
     <div id="admin-panel" style="display:none;">
-      <h2>Create New Contract Reference</h2>
-      <form id="contractForm" style="max-width: 600px; margin: 20px auto;">
-        <input type="text" id="clientName" placeholder="Client Full Name *" required />
-        <input type="email" id="clientEmail" placeholder="Client Email *" required />
-        <select id="requestType" required>
-          <option value="">-- Type *</option>
-          <option value="job">Job</option>
+      <h2>Manage Clients & Contracts</h2>
+      
+      <!-- FORMULAIRE -->
+      <form id="clientForm" style="max-width: 700px; margin: 20px auto; background: var(--card-bg); padding: 25px; border-radius: 12px;">
+        <input type="hidden" id="clientId" />
+        
+        <div class="form-row">
+          <input type="text" id="full_name" placeholder="Full Name *" required />
+          <input type="email" id="email" placeholder="Professional Email *" required />
+        </div>
+
+        <div class="form-row">
+          <select id="nationality" required>
+            <option value="">-- Nationality *</option>
+            <option value="Algerian">Algerian</option>
+            <option value="American">American</option>
+            <option value="French">French</option>            <!-- Ajoute d'autres pays si besoin -->
+          </select>
+          <div>
+            <label style="font-size:0.85rem;margin-bottom:6px;display:block;color:var(--gray);">Date of Birth *</label>
+            <input type="date" id="dob" required />
+          </div>
+        </div>
+
+        <select id="request_type" required>
+          <option value="">-- Request Type *</option>
+          <option value="job">Job (CDD/CDI)</option>
           <option value="internship">Internship</option>
           <option value="language-stay">Language Stay</option>
         </select>
+
+        <select id="category" required>
+          <option value="">-- Category *</option>
+          <option value="IT & Tech">IT & Technology</option>
+          <option value="Healthcare">Healthcare</option>
+          <option value="Education">Education</option>
+        </select>
+
+        <select id="period" required>
+          <option value="">-- Duration *</option>
+          <option value="3-6 months">3–6 months</option>
+          <option value="6-12 months">6–12 months</option>
+        </select>
+
         <select id="status" required>
           <option value="pending">En attente</option>
           <option value="validated">Validé</option>
           <option value="expired">Expiré</option>
         </select>
-        <div class="file-upload">
-          <label class="file-label">
-            <span>📄 Upload Contract (PDF)</span>
-            <input type="file" id="contractFile" accept=".pdf" required />
-          </label>          <div id="contract-preview" style="margin-top:8px;font-size:0.9rem;color:var(--gray);"></div>
+
+        <textarea id="message" placeholder="Additional notes..." rows="3"></textarea>
+
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+          <button type="submit" class="btn primary">Save Client</button>
+          <button type="button" id="deleteBtn" class="btn" style="background: var(--error); display: none;">Delete</button>
         </div>
-        <button type="submit" class="btn primary">Generate Reference</button>
       </form>
 
-      <div id="result" style="margin-top: 30px; padding: 15px; border-radius: 8px;"></div>
+      <!-- LISTE DES CLIENTS -->
+      <div style="margin-top: 40px;">
+        <h3>Clients List</h3>
+        <div id="clientsList" style="margin-top: 15px;"></div>
+      </div>
     </div>
   </main>
-
   <script>
-    // Simple login (password from env)
+    // === LOGIN ===
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const pass = document.getElementById('adminPass').value;
-      const res = await fetch('/.netlify/functions/auth', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: pass })
-      });
-      if (res.ok) {
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('admin-panel').style.display = 'block';
-      } else {
-        document.getElementById('login-error').style.display = 'block';
+      try {
+        const res = await fetch('/.netlify/functions/auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: pass })
+        });
+        if (res.ok) {
+          document.getElementById('login-screen').style.display = 'none';
+          document.getElementById('admin-panel').style.display = 'block';
+          loadClients();
+        } else {
+          document.getElementById('login-error').style.display = 'block';
+        }
+      } catch (err) {
+        alert('Network error');
       }
     });
 
-    // File preview for contract
-    document.getElementById('contractFile').addEventListener('change', function() {
-      const preview = document.getElementById('contract-preview');
-      if (this.files[0]) {
-        preview.innerHTML = `📄 ${this.files[0].name}`;
+    // === CHARGEMENT DES CLIENTS ===
+    async function loadClients() {
+      try {
+        const res = await fetch('/.netlify/functions/contracts');
+        const clients = await res.json();
+        const listDiv = document.getElementById('clientsList');
+        listDiv.innerHTML = clients.map(c => `
+          <div style="padding: 12px; border-bottom: 1px solid var(--border-color);">
+            <strong>${c.reference}</strong> - ${c.full_name} (${c.status})
+            <button onclick="editClient('${c.id}')" style="margin-left: 10px; font-size: 0.9rem;">Edit</button>
+          </div>
+        `).join('');
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // === ÉDITION D'UN CLIENT ===
+    window.editClient = async (id) => {
+      try {
+        const res = await fetch(`/.netlify/functions/contracts?id=${id}`);
+        const client = await res.json();
+        
+        document.getElementById('clientId').value = client.id;
+        document.getElementById('full_name').value = client.full_name;
+        document.getElementById('email').value = client.email;
+        document.getElementById('nationality').value = client.nationality;        document.getElementById('dob').value = client.dob;
+        document.getElementById('request_type').value = client.request_type;
+        document.getElementById('category').value = client.category;
+        document.getElementById('period').value = client.period;
+        document.getElementById('status').value = client.status;
+        document.getElementById('message').value = client.message || '';
+        
+        document.getElementById('deleteBtn').style.display = 'inline-block';
+      } catch (err) {
+        alert('Error loading client');
+      }
+    };
+
+    // === SUPPRESSION ===
+    document.getElementById('deleteBtn').addEventListener('click', async () => {
+      if (!confirm('Delete this client?')) return;
+      const id = document.getElementById('clientId').value;
+      try {
+        await fetch('/.netlify/functions/contracts', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id })
+        });
+        resetForm();
+        loadClients();
+      } catch (err) {
+        alert('Delete failed');
       }
     });
 
-    // Submit new contract
-    document.getElementById('contractForm').addEventListener('submit', async (e) => {
+    // === SOUMISSION DU FORMULAIRE ===
+    document.getElementById('clientForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const formData = new FormData();
-      formData.append('clientName', document.getElementById('clientName').value);
-      formData.append('clientEmail', document.getElementById('clientEmail').value);
-      formData.append('requestType', document.getElementById('requestType').value);
-      formData.append('status', document.getElementById('status').value);
-      formData.append('contractFile', document.getElementById('contractFile').files[0]);
+      
+      const data = {
+        id: document.getElementById('clientId').value || null,
+        full_name: document.getElementById('full_name').value,
+        email: document.getElementById('email').value,
+        nationality: document.getElementById('nationality').value,
+        dob: document.getElementById('dob').value,
+        request_type: document.getElementById('request_type').value,
+        category: document.getElementById('category').value,
+        period: document.getElementById('period').value,
+        status: document.getElementById('status').value,
+        message: document.getElementById('message').value
+      };
 
-      const res = await fetch('/.netlify/functions/create-contract', {
-        method: 'POST',
-        body: formData
-      });
-      const resultDiv = document.getElementById('result');
-      if (res.ok) {
-        const data = await res.json();
-        resultDiv.innerHTML = `<p style="color:var(--success);">✅ Reference created: <strong>${data.reference}</strong></p>`;
-        document.getElementById('contractForm').reset();
-        document.getElementById('contract-preview').innerHTML = '';
-      } else {
-        resultDiv.innerHTML = `<p style="color:var(--error);">❌ Error: ${await res.text()}</p>`;
+      try {
+        const res = await fetch('/.netlify/functions/contracts', {
+          method: data.id ? 'PUT' : 'POST',          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        
+        if (res.ok) {
+          resetForm();
+          loadClients();
+        } else {
+          alert('Save failed');
+        }
+      } catch (err) {
+        alert('Network error');
+      }
+    });
+
+    function resetForm() {
+      document.getElementById('clientForm').reset();
+      document.getElementById('clientId').value = '';
+      document.getElementById('deleteBtn').style.display = 'none';
+    }
+
+    // Theme toggle
+    document.addEventListener('DOMContentLoaded', () => {
+      const toggle = document.getElementById('themeToggle');
+      if (toggle) {
+        const saved = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', saved);
+        toggle.textContent = saved === 'dark' ? '🌙' : '☀️';
+        toggle.addEventListener('click', () => {
+          const newTheme = saved === 'dark' ? 'light' : 'dark';
+          document.documentElement.setAttribute('data-theme', newTheme);
+          localStorage.setItem('theme', newTheme);
+          toggle.textContent = newTheme === 'dark' ? '🌙' : '☀️';
+        });
       }
     });
   </script>
-  <script src="js/main.js"></script>
 </body>
 </html>
