@@ -3,25 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Check Your Contract Status — Vexara Global</title>
+  <title>Check Your Contract — Vexara Global</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
   <header>
     <div class="container">
-      <div class="header-content">
+      <div style="display: flex; align-items: center; gap: 12px;">
         <div class="logo">Vexara Global</div>
-        <div class="menu-toggle" id="menuToggle">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-        <ul class="nav-menu" id="navMenu">
-          <li><a href="index.html">Home</a></li>
-          <li><a href="check.html" class="active">Check My Contract</a></li>
-          <li><a href="index.html#contact">Contact</a></li>
-        </ul>
+        <button class="theme-toggle" id="themeToggle">☀️</button>
       </div>
+      <div class="menu-toggle" id="menuToggle">
+        <span></span><span></span><span></span>
+      </div>
+      <ul class="nav-menu" id="navMenu">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="check.html">Check My Contract</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
+      </ul>
     </div>
   </header>
 
@@ -32,15 +31,8 @@
         <p>Enter the unique reference you received after submitting your request.</p>
 
         <form id="checkForm" class="check-form">
-  <button type="submit" class="btn primary" style="width: auto; margin-bottom: 16px;">Verify</button>
-  <input 
-    type="text" 
-    id="reference" 
-    placeholder="Contract Reference (e.g. VX-2026-789)" 
-    autocomplete="off"
-    required 
-    style="width: 100%;"
-  />
+          <input type="text" id="reference" placeholder="Contract Reference (e.g. VX-2026-789)" required />
+          <button type="submit" class="btn primary">Verify</button>
         </form>
 
         <div id="result" class="result-box"></div>
@@ -50,57 +42,79 @@
 
   <footer>
     <div class="container">
-      &copy; 2023 Vexara Global — Track your international opportunity with confidence.
+      &copy; 2026 Vexara Global
     </div>
   </footer>
 
   <script>
-  document.getElementById('checkForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const ref = document.getElementById('reference').value.trim().toUpperCase();
-    const resultDiv = document.getElementById('result');
-    
-    if (!ref) {
-      resultDiv.innerHTML = `<p class="error">Please enter a reference.</p>`;
-      return;
-    }
-
-    resultDiv.innerHTML = '<p style="color:var(--gray);">Checking...</p>';
-
-    try {
-      const response = await fetch(`/.netlify/functions/check-contract?reference=${encodeURIComponent(ref)}`);
-      const data = await response.json();
-
-      if (response.ok) {
-        let statusText = '';
-        if (data.status === 'validated') statusText = '✅ Confirmed';
-        else if (data.status === 'pending') statusText = '⏳ Pending';
-        else if (data.status === 'expired') statusText = '❌ Expired';
-
-        resultDiv.innerHTML = `
-          <div class="status-success">
-            <strong>Contract Found</strong><br>
-            Reference: ${data.reference}<br>
-            Type: ${data.type}<br>
-            Status: ${statusText}
-          </div>
-        `;
-      } else {
-        resultDiv.innerHTML = `
-          <div class="status-error">
-            <strong>❌ Reference Not Found</strong><br>
-            Double-check your code.<br>
-            Still missing it? <a href="index.html#contact">Contact us</a>.
-          </div>
-        `;
+    document.getElementById('checkForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const ref = document.getElementById('reference').value.trim().toUpperCase();
+      const resultDiv = document.getElementById('result');
+      
+      if (!ref) {
+        resultDiv.innerHTML = '<p class="error">Please enter a reference.</p>';
+        return;
       }
-    } catch (err) {
-      console.error(err);
-      resultDiv.innerHTML = `<p class="error">Network error. Please try again.</p>`;
-    }
-  });
-  </script>
 
-  <script src="js/main.js"></script>
+      resultDiv.innerHTML = '<p style="color:var(--gray);">Checking...</p>';
+
+      try {
+        const response = await fetch(`/.netlify/functions/check-application?ref=${encodeURIComponent(ref)}`);
+        const data = await response.json();
+
+        if (response.ok) {
+          let statusText = '';
+          if (data.status === 'validated') statusText = '✅ Confirmed';
+          else if (data.status === 'pending') statusText = '⏳ Pending';
+          else if (data.status === 'expired') statusText = '❌ Expired';
+          else statusText = data.status;
+
+          resultDiv.innerHTML = `
+            <div class="status-success">
+              <strong>Contract Found</strong><br>
+              Reference: ${data.reference}<br>
+              Type: ${data.type}<br>
+              Status: ${statusText}
+            </div>
+          `;
+        } else {
+          resultDiv.innerHTML = `
+            <div class="status-error">
+              <strong>❌ Reference Not Found</strong><br>
+              Double-check your code.<br>
+              Still missing it? <a href="index.html#contact">Contact us</a>.
+            </div>
+          `;
+        }
+      } catch (err) {
+        console.error(err);
+        resultDiv.innerHTML = `<p class="error">Network error. Please try again.</p>`;
+      }
+    });
+
+    // Theme toggle
+    document.addEventListener('DOMContentLoaded', () => {
+      const toggle = document.getElementById('themeToggle');
+      if (toggle) {
+        const saved = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', saved);
+        toggle.textContent = saved === 'dark' ? '🌙' : '☀️';
+        toggle.addEventListener('click', () => {
+          const newTheme = saved === 'dark' ? 'light' : 'dark';
+          document.documentElement.setAttribute('data-theme', newTheme);
+          localStorage.setItem('theme', newTheme);
+          toggle.textContent = newTheme === 'dark' ? '🌙' : '☀️';
+        });
+      }
+
+      // Mobile menu
+      const menuToggle = document.getElementById('menuToggle');
+      const navMenu = document.getElementById('navMenu');
+      if (menuToggle && navMenu) {
+        menuToggle.addEventListener('click', () => navMenu.classList.toggle('active'));
+      }
+    });
+  </script>
 </body>
 </html>
