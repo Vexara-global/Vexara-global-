@@ -31,7 +31,7 @@
 
     <!-- ADMIN PANEL -->
     <div id="admin-panel" style="display:none;">
-      <h2>Manage Clients & Contracts</h2>
+      <h2>Manage Clients</h2>
       
       <!-- FORMULAIRE -->
       <form id="clientForm" style="max-width: 700px; margin: 20px auto; background: var(--card-bg); padding: 25px; border-radius: 12px;">
@@ -39,7 +39,7 @@
         
         <div class="form-row">
           <input type="text" id="full_name" placeholder="Full Name *" required />
-          <input type="email" id="email" placeholder="Professional Email *" required />
+          <input type="email" id="email" placeholder="Email *" required />
         </div>
 
         <div class="form-row">
@@ -47,17 +47,18 @@
             <option value="">-- Nationality *</option>
             <option value="Algerian">Algerian</option>
             <option value="American">American</option>
-            <option value="French">French</option>            <!-- Ajoute d'autres pays si besoin -->
+            <option value="French">French</option>            <option value="German">German</option>
+            <!-- Ajoute plus si besoin -->
           </select>
           <div>
             <label style="font-size:0.85rem;margin-bottom:6px;display:block;color:var(--gray);">Date of Birth *</label>
-            <input type="date" id="dob" required />
+            <input type="date" id="date_of_birth" required />
           </div>
         </div>
 
         <select id="request_type" required>
-          <option value="">-- Request Type *</option>
-          <option value="job">Job (CDD/CDI)</option>
+          <option value="">-- Type *</option>
+          <option value="job">Job</option>
           <option value="internship">Internship</option>
           <option value="language-stay">Language Stay</option>
         </select>
@@ -67,21 +68,25 @@
           <option value="IT & Tech">IT & Technology</option>
           <option value="Healthcare">Healthcare</option>
           <option value="Education">Education</option>
+          <option value="Engineering">Engineering</option>
         </select>
 
-        <select id="period" required>
+        <select id="duration" required>
           <option value="">-- Duration *</option>
+          <option value="1-3 months">1–3 months</option>
           <option value="3-6 months">3–6 months</option>
           <option value="6-12 months">6–12 months</option>
+          <option value="12+ months">12+ months</option>
         </select>
 
         <select id="status" required>
           <option value="pending">En attente</option>
           <option value="validated">Validé</option>
           <option value="expired">Expiré</option>
+          <option value="rejected">Rejeté</option>
         </select>
 
-        <textarea id="message" placeholder="Additional notes..." rows="3"></textarea>
+        <textarea id="message" placeholder="Notes..." rows="2"></textarea>
 
         <div style="display: flex; gap: 10px; margin-top: 15px;">
           <button type="submit" class="btn primary">Save Client</button>
@@ -89,13 +94,13 @@
         </div>
       </form>
 
-      <!-- LISTE DES CLIENTS -->
+      <!-- LISTE -->
       <div style="margin-top: 40px;">
-        <h3>Clients List</h3>
-        <div id="clientsList" style="margin-top: 15px;"></div>
+        <h3>Clients List</h3>        <div id="clientsList" style="margin-top: 15px;"></div>
       </div>
     </div>
   </main>
+
   <script>
     // === LOGIN ===
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
@@ -119,16 +124,16 @@
       }
     });
 
-    // === CHARGEMENT DES CLIENTS ===
+    // === CHARGER LA LISTE ===
     async function loadClients() {
       try {
-        const res = await fetch('/.netlify/functions/contracts');
+        const res = await fetch('/.netlify/functions/applications');
         const clients = await res.json();
         const listDiv = document.getElementById('clientsList');
         listDiv.innerHTML = clients.map(c => `
           <div style="padding: 12px; border-bottom: 1px solid var(--border-color);">
-            <strong>${c.reference}</strong> - ${c.full_name} (${c.status})
-            <button onclick="editClient('${c.id}')" style="margin-left: 10px; font-size: 0.9rem;">Edit</button>
+            <strong>${c.reference_code}</strong> - ${c.full_name} (${c.status})
+            <button onclick="editClient(${c.id})" style="margin-left: 10px; font-size: 0.9rem;">Edit</button>
           </div>
         `).join('');
       } catch (err) {
@@ -136,19 +141,19 @@
       }
     }
 
-    // === ÉDITION D'UN CLIENT ===
+    // === ÉDITION ===
     window.editClient = async (id) => {
       try {
-        const res = await fetch(`/.netlify/functions/contracts?id=${id}`);
-        const client = await res.json();
-        
+        const res = await fetch(`/.netlify/functions/applications?id=${id}`);
+        const client = await res.json();        
         document.getElementById('clientId').value = client.id;
         document.getElementById('full_name').value = client.full_name;
         document.getElementById('email').value = client.email;
-        document.getElementById('nationality').value = client.nationality;        document.getElementById('dob').value = client.dob;
+        document.getElementById('nationality').value = client.nationality;
+        document.getElementById('date_of_birth').value = client.date_of_birth;
         document.getElementById('request_type').value = client.request_type;
         document.getElementById('category').value = client.category;
-        document.getElementById('period').value = client.period;
+        document.getElementById('duration').value = client.duration;
         document.getElementById('status').value = client.status;
         document.getElementById('message').value = client.message || '';
         
@@ -163,7 +168,7 @@
       if (!confirm('Delete this client?')) return;
       const id = document.getElementById('clientId').value;
       try {
-        await fetch('/.netlify/functions/contracts', {
+        await fetch('/.netlify/functions/applications', {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ id })
@@ -175,7 +180,7 @@
       }
     });
 
-    // === SOUMISSION DU FORMULAIRE ===
+    // === SOUMISSION ===
     document.getElementById('clientForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       
@@ -184,17 +189,17 @@
         full_name: document.getElementById('full_name').value,
         email: document.getElementById('email').value,
         nationality: document.getElementById('nationality').value,
-        dob: document.getElementById('dob').value,
+        date_of_birth: document.getElementById('date_of_birth').value,
         request_type: document.getElementById('request_type').value,
         category: document.getElementById('category').value,
-        period: document.getElementById('period').value,
+        duration: document.getElementById('duration').value,
         status: document.getElementById('status').value,
-        message: document.getElementById('message').value
-      };
+        message: document.getElementById('message').value      };
 
       try {
-        const res = await fetch('/.netlify/functions/contracts', {
-          method: data.id ? 'PUT' : 'POST',          headers: { 'Content-Type': 'application/json' },
+        const res = await fetch('/.netlify/functions/applications', {
+          method: data.id ? 'PUT' : 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)
         });
         
@@ -215,7 +220,7 @@
       document.getElementById('deleteBtn').style.display = 'none';
     }
 
-    // Theme toggle
+    // Theme + menu
     document.addEventListener('DOMContentLoaded', () => {
       const toggle = document.getElementById('themeToggle');
       if (toggle) {
@@ -228,6 +233,12 @@
           localStorage.setItem('theme', newTheme);
           toggle.textContent = newTheme === 'dark' ? '🌙' : '☀️';
         });
+      }
+
+      const menuToggle = document.getElementById('menuToggle');
+      const navMenu = document.getElementById('navMenu');
+      if (menuToggle && navMenu) {
+        menuToggle.addEventListener('click', () => navMenu.classList.toggle('active'));
       }
     });
   </script>
