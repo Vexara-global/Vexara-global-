@@ -14,7 +14,14 @@ exports.handler = async (event) => {
     }
 
     const res = await pool.query(
-      'SELECT reference_code, request_type, status, full_name FROM applications WHERE reference_code = $1',
+      `SELECT 
+        reference_code, 
+        full_name, 
+        category, 
+        request_type, 
+        status 
+       FROM applications 
+       WHERE reference_code = $1`,
       [ref.toUpperCase()]
     );
 
@@ -27,9 +34,10 @@ exports.handler = async (event) => {
       statusCode: 200,
       body: JSON.stringify({
         reference: app.reference_code,
+        fullName: app.full_name,
+        category: app.category,
         type: app.request_type,
-        status: app.status,
-        name: app.full_name
+        status: app.status
       })
     };
   } catch (err) {
