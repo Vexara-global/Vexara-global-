@@ -47,73 +47,106 @@
   </footer>
 
   <script>
-    document.getElementById('checkForm').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      const ref = document.getElementById('reference').value.trim().toUpperCase();
-      const resultDiv = document.getElementById('result');
-      
-      if (!ref) {
-        resultDiv.innerHTML = '<p class="error">Please enter a reference.</p>';
-        return;
-      }
+  document.getElementById('checkForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const ref = document.getElementById('reference').value.trim().toUpperCase();
+    const resultDiv = document.getElementById('result');
+    
+    if (!ref) {
+      resultDiv.innerHTML = '<p style="color:#ef4444;">Please enter a reference.</p>';
+      return;
+    }
 
-      resultDiv.innerHTML = '<p style="color:var(--gray);">Checking...</p>';
+    resultDiv.innerHTML = '<p style="color:#94a3b8;">Checking...</p>';
 
-      try {
-        const response = await fetch(`/.netlify/functions/check-application?ref=${encodeURIComponent(ref)}`);
-        const data = await response.json();
+    try {
+      const response = await fetch(`/.netlify/functions/check-application?ref=${encodeURIComponent(ref)}`);
+      const data = await response.json();
 
-        if (response.ok) {
-          let statusText = '';
-          if (data.status === 'validated') statusText = '✅ Confirmed';
-          else if (data.status === 'pending') statusText = '⏳ Pending';
-          else if (data.status === 'expired') statusText = '❌ Expired';
-          else statusText = data.status;
-
-          resultDiv.innerHTML = `
-            <div class="status-success">
-              <strong>Contract Found</strong><br>
-              Reference: ${data.reference}<br>
-              Type: ${data.type}<br>
-              Status: ${statusText}
-            </div>
-          `;
+      if (response.ok) {
+        // Détermine l'icône et le texte du statut
+        let statusIcon, statusText, statusColor;
+        if (data.status === 'validated') {
+          statusIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="#10b981" stroke-width="2"/></svg>';
+          statusText = 'Confirmed';
+          statusColor = '#10b981';
+        } else if (data.status === 'pending') {
+          statusIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" stroke="#f59e0b" stroke-width="2"/></svg>';
+          statusText = 'Pending';
+          statusColor = '#f59e0b';
         } else {
-          resultDiv.innerHTML = `
-            <div class="status-error">
-              <strong>❌ Reference Not Found</strong><br>
-              Double-check your code.<br>
-              Still missing it? <a href="index.html#contact">Contact us</a>.
-            </div>
-          `;
+          statusIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 18L18 6M6 6l12 12" stroke="#ef4444" stroke-width="2"/></svg>';
+          statusText = data.status.charAt(0).toUpperCase() + data.status.slice(1);
+          statusColor = '#ef4444';
         }
-      } catch (err) {
-        console.error(err);
-        resultDiv.innerHTML = `<p class="error">Network error. Please try again.</p>`;
-      }
-    });
 
-    // Theme toggle
-    document.addEventListener('DOMContentLoaded', () => {
-      const toggle = document.getElementById('themeToggle');
-      if (toggle) {
-        const saved = localStorage.getItem('theme') || 'light';
-        document.documentElement.setAttribute('data-theme', saved);
-        toggle.textContent = saved === 'dark' ? '🌙' : '☀️';
-        toggle.addEventListener('click', () => {
-          const newTheme = saved === 'dark' ? 'light' : 'dark';
-          document.documentElement.setAttribute('data-theme', newTheme);
-          localStorage.setItem('theme', newTheme);
-          toggle.textContent = newTheme === 'dark' ? '🌙' : '☀️';
-        });
-      }
+        // Formatte le type
+        const formattedType = data.type
+          .split('-')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ');
 
-      // Mobile menu
-      const menuToggle = document.getElementById('menuToggle');
-      const navMenu = document.getElementById('navMenu');
-      if (menuToggle && navMenu) {
-        menuToggle.addEventListener('click', () => navMenu.classList.toggle('active'));
+        resultDiv.innerHTML = `
+          <div style="
+            margin-top: 30px;
+            padding: 24px;
+            background: #052e16;
+            border-radius: 16px;
+            border-left: 4px solid ${statusColor};
+            color: #f1f5f9;
+            font-size: 1.05rem;
+            line-height: 1.6;          ">
+            <h3 style="margin: 0 0 16px 0; color: ${statusColor}; font-size: 1.4rem;">Contract Found</h3>
+            <p><strong>Reference:</strong> ${data.reference}</p>
+            <p><strong>Full Name:</strong> ${data.fullName}</p>
+            <p><strong>Category:</strong> ${data.category}</p>
+            <p><strong>Type:</strong> ${formattedType}</p>
+            <p><strong>Status:</strong> <span style="display: inline-flex; align-items: center; gap: 8px;">${statusIcon} ${statusText}</span></p>
+          </div>
+        `;
+      } else {
+        resultDiv.innerHTML = `
+          <div style="
+            margin-top: 30px;
+            padding: 24px;
+            background: #450a0a;
+            border-radius: 16px;
+            border-left: 4px solid #ef4444;
+            color: #fca5a5;
+            font-size: 1.05rem;
+            line-height: 1.6;
+          ">
+            <h3 style="margin: 0 0 16px 0; color: #f87171; font-size: 1.4rem;">Reference Not Found</h3>
+            <p>Please double-check your reference code.</p>
+            <p>Still missing it? <a href="index.html#contact" style="color:#f87171; text-decoration:underline;">Contact us</a>.</p>
+          </div>
+        `;
       }
+    } catch (err) {
+      console.error(err);
+      resultDiv.innerHTML = `<p style="color:#ef4444; margin-top:16px;">Network error. Please try again.</p>`;
+    }
+  });
+
+  // Theme toggle + menu mobile (si pas déjà inclus)
+  document.addEventListener('DOMContentLoaded', () => {
+    const toggle = document.getElementById('themeToggle');
+    if (toggle) {
+      const saved = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', saved);
+      toggle.textContent = saved === 'dark' ? '🌙' : '☀️';
+      toggle.addEventListener('click', () => {
+        const newTheme = saved === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        toggle.textContent = newTheme === 'dark' ? '🌙' : '☀️';
+      });
+    }
+
+    const menuToggle = document.getElementById('menuToggle');
+    const navMenu = document.getElementById('navMenu');    if (menuToggle && navMenu) {
+      menuToggle.addEventListener('click', () => navMenu.classList.toggle('active'));
+    }
     });
   </script>
 </body>
