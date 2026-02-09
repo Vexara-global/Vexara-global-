@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="Vexara Global — International job, internship & language stay platform in 90+ countries. Track your application by reference." />
+  <meta name="description" content="Vexara Global — International job, internship & language stay platform in 90+ countries. No registration required." />
   <title>Vexara Global | International Opportunities</title>
   <link rel="stylesheet" href="css/style.css" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>V</text></svg>">
@@ -11,22 +11,20 @@
 <body>
   <header>
     <div class="container">
-      <div class="header-content">
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <div class="logo">Vexara Global</div>
-          <button class="theme-toggle" id="themeToggle">☀️</button>
-        </div>
-        <div class="menu-toggle" id="menuToggle">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-        <ul class="nav-menu" id="navMenu">
-          <li><a href="index.html">Home</a></li>
-          <li><a href="check.html">Check My Contract</a></li>
-          <li><a href="#contact">Contact</a></li>
-        </ul>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div class="logo">Vexara Global</div>
+        <button class="theme-toggle" id="themeToggle">☀️</button>
       </div>
+      <div class="menu-toggle" id="menuToggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <ul class="nav-menu" id="navMenu">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="check.html">Check My Contract</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
     </div>
   </header>
 
@@ -34,7 +32,7 @@
     <div class="container hero-content">
       <h1>International Opportunities.<br/>No Compromises.</h1>
       <p class="subtitle">
-        Find jobs (CDD/CDI), internships, or language stays in <strong>90+ countries</strong>
+        Find jobs (CDD/CDI), internships, or language stays in <strong>90+ countries</strong> — <em>no account needed</em>, with secure tracking.
       </p>
       <div class="trust-badges">
         <span>🔒 Unique reference tracking</span>
@@ -47,7 +45,8 @@
 
   <section class="values">
     <div class="container">
-      <h2>Why thousands of candidates trust us</h2>      <div class="cards">
+      <h2>Why thousands of candidates trust us</h2>
+      <div class="cards">
         <div class="card">
           <h3>✅ Full Transparency</h3>
           <p>Submit once, get a reference, and track your application securely.</p>
@@ -69,9 +68,7 @@
       <h2>Submit Your Request in 60 Seconds</h2>
       <p class="form-note">We’ll email you a unique tracking reference within 48 hours.</p>
 
-      <form name="contact" method="POST" data-netlify="true" class="contact-form">
-        <input type="hidden" name="form-name" value="contact" />
-
+      <form id="submissionForm" class="contact-form">
         <div class="form-row">
           <input type="text" name="full_name" placeholder="Full Name *" required />
           <input type="email" name="email" placeholder="Professional Email *" required />
@@ -96,7 +93,8 @@
             <option value="Canadian">Canadian</option>
             <option value="Chinese">Chinese</option>
             <option value="Colombian">Colombian</option>
-            <option value="Congolese">Congolese</option>            <option value="Danish">Danish</option>
+            <option value="Congolese">Congolese</option>
+            <option value="Danish">Danish</option>
             <option value="Dutch">Dutch</option>
             <option value="Egyptian">Egyptian</option>
             <option value="Emirati">Emirati</option>
@@ -145,12 +143,12 @@
             <option value="Tunisian">Tunisian</option>
             <option value="Turkish">Turkish</option>
             <option value="Ukrainian">Ukrainian</option>
-            <option value="Vietnamese">Vietnamese</option>            <option value="Yemeni">Yemeni</option>
+            <option value="Vietnamese">Vietnamese</option>
+            <option value="Yemeni">Yemeni</option>
             <option value="Zambian">Zambian</option>
             <option value="Zimbabwean">Zimbabwean</option>
           </select>
           
-          <!-- Label explicite pour Date of Birth -->
           <div>
             <label style="font-size:0.85rem;margin-bottom:6px;display:block;color:var(--gray);">Date of Birth *</label>
             <input type="date" name="dob" required />
@@ -189,26 +187,72 @@
           <option value="Flexible">Flexible</option>
         </select>
 
-        <div class="file-upload">
-  <label class="file-label">
-    <span>📎 Upload Diploma (JPG, JPEG, PDF)</span>
-    <input type="file" name="diploma" accept=".jpg,.jpeg,.pdf" required />
-  </label>
-  <div id="file-preview" style="margin-top: 8px; font-size: 0.9rem; color: var(--gray); display: flex; align-items: center; gap: 8px;"></div>
-        </div>
         <textarea name="message" placeholder="Describe your profile, target countries, experience, goals, etc. *" rows="5" required></textarea>
 
         <button type="submit" class="btn large">Send My Request</button>
+        <div id="form-result" style="margin-top: 16px; font-size: 0.95rem;"></div>
       </form>
     </div>
   </section>
 
   <footer>
     <div class="container">
-      <p>&copy; 2023 Vexara Global — International platform for professional and educational opportunities.</p>
+      <p>&copy; 2026 Vexara Global — International platform for professional and educational opportunities.</p>
     </div>
   </footer>
 
-  <script src="js/main.js"></script>
+  <script>
+    document.getElementById('submissionForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      
+      const resultDiv = document.getElementById('form-result');
+      resultDiv.innerHTML = '<span style="color:var(--gray);">Saving your request...</span>';
+
+      try {
+        const res = await fetch('/.netlify/functions/save-submission', {
+          method: 'POST',
+          body: new URLSearchParams(formData)
+        });
+
+        if (res.ok) {
+          resultDiv.innerHTML = `
+            <div style="color:#10b981; padding: 12px; background:#f0fdf4; border-radius:8px;">
+              ✅ Thank you! Your request has been saved.<br>
+              We’ll contact you within 48 hours.
+            </div>
+          `;
+          e.target.reset();
+        } else {
+          throw new Error('Failed to save');
+        }
+      } catch (err) {
+        console.error(err);
+        resultDiv.innerHTML = `<div style="color:#ef4444;">❌ Oops! Please try again.</div>`;
+      }
+    });
+
+    // Theme toggle + mobile menu
+    document.addEventListener('DOMContentLoaded', () => {
+      const toggle = document.getElementById('themeToggle');
+      if (toggle) {
+        const saved = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', saved);
+        toggle.textContent = saved === 'dark' ? '🌙' : '☀️';
+        toggle.addEventListener('click', () => {
+          const newTheme = saved === 'dark' ? 'light' : 'dark';
+          document.documentElement.setAttribute('data-theme', newTheme);
+          localStorage.setItem('theme', newTheme);
+          toggle.textContent = newTheme === 'dark' ? '🌙' : '☀️';
+        });
+      }
+
+      const menuToggle = document.getElementById('menuToggle');
+      const navMenu = document.getElementById('navMenu');
+      if (menuToggle && navMenu) {
+        menuToggle.addEventListener('click', () => navMenu.classList.toggle('active'));
+      }
+    });
+  </script>
 </body>
 </html>
