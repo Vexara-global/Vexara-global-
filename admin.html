@@ -31,72 +31,93 @@
 
     <!-- ADMIN PANEL -->
     <div id="admin-panel" style="display:none;">
-      <h2>Manage Clients</h2>
-      
-      <!-- FORMULAIRE -->
-      <form id="clientForm" style="max-width: 700px; margin: 20px auto; background: var(--card-bg); padding: 25px; border-radius: 12px;">
-        <input type="hidden" id="clientId" />
-        
-        <div class="form-row">
-          <input type="text" id="full_name" placeholder="Full Name *" required />
-          <input type="email" id="email" placeholder="Email *" required />
-        </div>
+      <h2>Manage Clients & Submissions</h2>
 
-        <div class="form-row">
-          <select id="nationality" required>
-            <option value="">-- Nationality *</option>
-            <option value="Algerian">Algerian</option>
-            <option value="American">American</option>
-            <option value="French">French</option>            <option value="German">German</option>
-            <!-- Ajoute plus si besoin -->
-          </select>
-          <div>
-            <label style="font-size:0.85rem;margin-bottom:6px;display:block;color:var(--gray);">Date of Birth *</label>
-            <input type="date" id="date_of_birth" required />
+      <!-- Onglets -->
+      <div style="display: flex; gap: 10px; margin: 20px 0; flex-wrap: wrap;">
+        <button onclick="showSection('manual')" class="btn" style="padding:8px 16px;">Create Contract Manually</button>
+        <button onclick="showSection('submissions')" class="btn" style="padding:8px 16px;">Review Submissions</button>
+      </div>
+
+      <!-- Section 1: Création manuelle (inchangée) -->
+      <div id="manual-section">
+        <h3>Create New Contract Reference</h3>
+        <form id="clientForm" style="max-width: 700px; margin: 20px auto; background: var(--card-bg); padding: 25px; border-radius: 12px;">
+          <input type="hidden" id="clientId" />
+          
+          <div class="form-row">
+            <input type="text" id="full_name" placeholder="Full Name *" required />
+            <input type="email" id="email" placeholder="Email *" required />
           </div>
+
+          <div class="form-row">
+            <select id="nationality" required>
+              <option value="">-- Nationality *</option>
+              <option value="Algerian">Algerian</option>
+              <option value="American">American</option>
+              <option value="French">French</option>
+              <option value="German">German</option>
+              <option value="British">British</option>
+              <option value="Canadian">Canadian</option>
+              <option value="Italian">Italian</option>
+              <option value="Spanish">Spanish</option>
+              <option value="Moroccan">Moroccan</option>
+              <option value="Egyptian">Egyptian</option>
+            </select>
+            <div>
+              <label style="font-size:0.85rem;margin-bottom:6px;display:block;color:var(--gray);">Date of Birth *</label>
+              <input type="date" id="date_of_birth" required />
+            </div>
+          </div>
+
+          <select id="request_type" required>
+            <option value="">-- Type *</option>
+            <option value="job">Job</option>
+            <option value="internship">Internship</option>
+            <option value="language-stay">Language Stay</option>
+          </select>
+
+          <select id="category" required>
+            <option value="">-- Category *</option>
+            <option value="IT & Tech">IT & Technology</option>
+            <option value="Healthcare">Healthcare</option>
+            <option value="Education">Education</option>
+            <option value="Engineering">Engineering</option>
+            <option value="Business & Finance">Business & Finance</option>
+          </select>
+
+          <select id="duration" required>
+            <option value="">-- Duration *</option>
+            <option value="1-3 months">1–3 months</option>
+            <option value="3-6 months">3–6 months</option>
+            <option value="6-12 months">6–12 months</option>
+          </select>
+
+          <select id="status" required>
+            <option value="pending">En attente</option>
+            <option value="validated">Validé</option>
+            <option value="expired">Expiré</option>
+            <option value="rejected">Rejeté</option>
+          </select>
+
+          <textarea id="message" placeholder="Notes..." rows="2"></textarea>
+
+          <div style="display: flex; gap: 10px; margin-top: 15px;">
+            <button type="submit" class="btn primary">Save Client</button>
+            <button type="button" id="deleteBtn" class="btn" style="background: var(--error); display: none;">Delete</button>
+          </div>
+        </form>
+
+        <div style="margin-top: 40px;">
+          <h3>Clients List</h3>
+          <div id="clientsList" style="margin-top: 15px;"></div>
         </div>
+      </div>
 
-        <select id="request_type" required>
-          <option value="">-- Type *</option>
-          <option value="job">Job</option>
-          <option value="internship">Internship</option>
-          <option value="language-stay">Language Stay</option>
-        </select>
-
-        <select id="category" required>
-          <option value="">-- Category *</option>
-          <option value="IT & Tech">IT & Technology</option>
-          <option value="Healthcare">Healthcare</option>
-          <option value="Education">Education</option>
-          <option value="Engineering">Engineering</option>
-        </select>
-
-        <select id="duration" required>
-          <option value="">-- Duration *</option>
-          <option value="1-3 months">1–3 months</option>
-          <option value="3-6 months">3–6 months</option>
-          <option value="6-12 months">6–12 months</option>
-          <option value="12+ months">12+ months</option>
-        </select>
-
-        <select id="status" required>
-          <option value="pending">En attente</option>
-          <option value="validated">Validé</option>
-          <option value="expired">Expiré</option>
-          <option value="rejected">Rejeté</option>
-        </select>
-
-        <textarea id="message" placeholder="Notes..." rows="2"></textarea>
-
-        <div style="display: flex; gap: 10px; margin-top: 15px;">
-          <button type="submit" class="btn primary">Save Client</button>
-          <button type="button" id="deleteBtn" class="btn" style="background: var(--error); display: none;">Delete</button>
-        </div>
-      </form>
-
-      <!-- LISTE -->
-      <div style="margin-top: 40px;">
-        <h3>Clients List</h3>        <div id="clientsList" style="margin-top: 15px;"></div>
+      <!-- Section 2: Candidatures -->
+      <div id="submissions-section" style="display:none;">
+        <h3>New Submissions</h3>
+        <div id="submissionsList" style="margin-top: 15px;"></div>
       </div>
     </div>
   </main>
@@ -124,7 +145,7 @@
       }
     });
 
-    // === CHARGER LA LISTE ===
+    // === CHARGEMENT DES CLIENTS ===
     async function loadClients() {
       try {
         const res = await fetch('/.netlify/functions/applications');
@@ -141,11 +162,12 @@
       }
     }
 
-    // === ÉDITION ===
+    // === ÉDITION CLIENT ===
     window.editClient = async (id) => {
       try {
         const res = await fetch(`/.netlify/functions/applications?id=${id}`);
-        const client = await res.json();        
+        const client = await res.json();
+        
         document.getElementById('clientId').value = client.id;
         document.getElementById('full_name').value = client.full_name;
         document.getElementById('email').value = client.email;
@@ -163,7 +185,7 @@
       }
     };
 
-    // === SUPPRESSION ===
+    // === SUPPRESSION CLIENT ===
     document.getElementById('deleteBtn').addEventListener('click', async () => {
       if (!confirm('Delete this client?')) return;
       const id = document.getElementById('clientId').value;
@@ -180,7 +202,7 @@
       }
     });
 
-    // === SOUMISSION ===
+    // === SOUMISSION FORMULAIRE CLIENT ===
     document.getElementById('clientForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       
@@ -194,7 +216,8 @@
         category: document.getElementById('category').value,
         duration: document.getElementById('duration').value,
         status: document.getElementById('status').value,
-        message: document.getElementById('message').value      };
+        message: document.getElementById('message').value
+      };
 
       try {
         const res = await fetch('/.netlify/functions/applications', {
@@ -220,7 +243,78 @@
       document.getElementById('deleteBtn').style.display = 'none';
     }
 
-    // Theme + menu
+    // === GESTION DES CANDIDATURES ===
+    async function loadSubmissions() {
+      try {
+        const res = await fetch('/.netlify/functions/applications/submissions');
+        const subs = await res.json();
+        const listDiv = document.getElementById('submissionsList');
+        listDiv.innerHTML = subs.map(s => `
+          <div style="padding: 12px; border-bottom: 1px solid var(--border-color);">
+            <strong>${s.full_name}</strong> - ${s.email} (${s.nationality})
+            <div style="margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap;">
+              <button onclick="createContractFromSubmission(${s.id})" style="font-size:0.85rem;">Create Contract</button>
+              <button onclick="deleteSubmission(${s.id})" style="font-size:0.85rem; background:#ef4444; color:white;">Delete</button>
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function createContractFromSubmission(id) {
+      if (!confirm('Create contract from this submission?')) return;
+      
+      try {
+        const res = await fetch('/.netlify/functions/applications/submissions');
+        const subs = await res.json();
+        const sub = subs.find(s => s.id == id);
+        
+        if (!sub) return alert('Submission not found');
+        
+        const response = await fetch('/.netlify/functions/applications/submissions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...sub,
+            submission_id: id
+          })
+        });
+        
+        const result = await response.json();
+        alert(`✅ Contract created!\nReference: ${result.reference}`);
+        loadSubmissions();
+        loadClients();
+      } catch (err) {
+        alert('Failed to create contract');
+      }
+    }
+
+    async function deleteSubmission(id) {
+      if (!confirm('Delete this submission?')) return;
+      try {
+        await fetch('/.netlify/functions/applications/submissions', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id })
+        });
+        loadSubmissions();
+      } catch (err) {
+        alert('Delete failed');
+      }
+    }
+
+    // === ONGLETS ===
+    function showSection(section) {
+      document.getElementById('manual-section').style.display = section === 'manual' ? 'block' : 'none';
+      document.getElementById('submissions-section').style.display = section === 'submissions' ? 'block' : 'none';
+      
+      if (section === 'submissions') loadSubmissions();
+      if (section === 'manual') loadClients();
+    }
+
+    // === THEME + MENU ===
     document.addEventListener('DOMContentLoaded', () => {
       const toggle = document.getElementById('themeToggle');
       if (toggle) {
