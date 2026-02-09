@@ -13,7 +13,35 @@ function generateRef() {
 exports.handler = async (event) => {
   try {
     const method = event.httpMethod;
+    const path = event.path;
 
+    // === GESTION DES CANDIDATURES (submissions) ===
+    if (path.includes('/submissions')) {
+      // GET /submissions → liste toutes les candidatures
+      if (method === 'GET') {
+        const res = await pool.query('SELECT * FROM submissions ORDER BY submitted_at DESC');
+        return { statusCode: 200, body: JSON.stringify(res.rows) };
+      }
+
+      // DELETE /submissions → supprime une candidature
+      if (method === 'DELETE') {
+        const data = JSON.parse(event.body);
+        await pool.query('DELETE FROM submissions WHERE id = $1', [data.id]);
+        return { statusCode: 200, body: '{}' };
+      }
+
+      // PUT /submissions → modifie une candidature
+      if (method === 'PUT') {
+        const data = JSON.parse(event.body);
+        await pool.query(
+          'UPDATE submissions SET full_name = $1, email = $2 WHERE id = $3',
+          [data.full_name, data.email, data.id]
+        );
+        return { statusCode: 200, body: '{}' };
+      }
+    }
+
+    // === GESTION DES CONTRATS (applications) ===
     if (method === 'GET') {
       const id = event.queryStringParameters?.id;
       if (id) {
@@ -37,6 +65,7 @@ exports.handler = async (event) => {
         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
         RETURNING id, reference_code
       `;
+
       const values = [
         data.full_name,
         data.email,
