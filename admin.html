@@ -31,17 +31,17 @@
 
     <!-- ADMIN PANEL -->
     <div id="admin-panel" style="display:none;">
-      <h2>Manage Clients & Submissions</h2>
+      <h2>Admin Dashboard</h2>
 
       <!-- Onglets -->
       <div style="display: flex; gap: 10px; margin: 20px 0; flex-wrap: wrap;">
-        <button onclick="showSection('manual')" class="btn" style="padding:8px 16px;">Create Contract Manually</button>
-        <button onclick="showSection('submissions')" class="btn" style="padding:8px 16px;">Review Submissions</button>
+        <button onclick="showSection('contracts')" class="btn" style="padding:8px 16px;">Contracts</button>
+        <button onclick="showSection('submissions')" class="btn" style="padding:8px 16px;">Submissions</button>
       </div>
 
-      <!-- Section 1: Création manuelle (inchangée) -->
-      <div id="manual-section">
-        <h3>Create New Contract Reference</h3>
+      <!-- Section Contrats -->
+      <div id="contracts-section">
+        <h3>Manage Contracts</h3>
         <form id="clientForm" style="max-width: 700px; margin: 20px auto; background: var(--card-bg); padding: 25px; border-radius: 12px;">
           <input type="hidden" id="clientId" />
           
@@ -56,13 +56,6 @@
               <option value="Algerian">Algerian</option>
               <option value="American">American</option>
               <option value="French">French</option>
-              <option value="German">German</option>
-              <option value="British">British</option>
-              <option value="Canadian">Canadian</option>
-              <option value="Italian">Italian</option>
-              <option value="Spanish">Spanish</option>
-              <option value="Moroccan">Moroccan</option>
-              <option value="Egyptian">Egyptian</option>
             </select>
             <div>
               <label style="font-size:0.85rem;margin-bottom:6px;display:block;color:var(--gray);">Date of Birth *</label>
@@ -82,8 +75,6 @@
             <option value="IT & Tech">IT & Technology</option>
             <option value="Healthcare">Healthcare</option>
             <option value="Education">Education</option>
-            <option value="Engineering">Engineering</option>
-            <option value="Business & Finance">Business & Finance</option>
           </select>
 
           <select id="duration" required>
@@ -97,27 +88,28 @@
             <option value="pending">En attente</option>
             <option value="validated">Validé</option>
             <option value="expired">Expiré</option>
-            <option value="rejected">Rejeté</option>
           </select>
 
           <textarea id="message" placeholder="Notes..." rows="2"></textarea>
 
           <div style="display: flex; gap: 10px; margin-top: 15px;">
-            <button type="submit" class="btn primary">Save Client</button>
+            <button type="submit" class="btn primary">Save Contract</button>
             <button type="button" id="deleteBtn" class="btn" style="background: var(--error); display: none;">Delete</button>
           </div>
         </form>
 
         <div style="margin-top: 40px;">
-          <h3>Clients List</h3>
+          <h3>Contracts List</h3>
           <div id="clientsList" style="margin-top: 15px;"></div>
         </div>
       </div>
 
-      <!-- Section 2: Candidatures -->
+      <!-- Section Candidatures -->
       <div id="submissions-section" style="display:none;">
-        <h3>New Submissions</h3>
-        <div id="submissionsList" style="margin-top: 15px;"></div>
+        <h3>Candidate Submissions</h3>
+        <div id="submissionsList" style="margin-top: 15px;">
+          <p>Loading...</p>
+        </div>
       </div>
     </div>
   </main>
@@ -145,7 +137,7 @@
       }
     });
 
-    // === CHARGEMENT DES CLIENTS ===
+    // === CHARGEMENT DES CONTRATS ===
     async function loadClients() {
       try {
         const res = await fetch('/.netlify/functions/applications');
@@ -162,7 +154,7 @@
       }
     }
 
-    // === ÉDITION CLIENT ===
+    // === ÉDITION CONTRAT ===
     window.editClient = async (id) => {
       try {
         const res = await fetch(`/.netlify/functions/applications?id=${id}`);
@@ -185,9 +177,9 @@
       }
     };
 
-    // === SUPPRESSION CLIENT ===
+    // === SUPPRESSION CONTRAT ===
     document.getElementById('deleteBtn').addEventListener('click', async () => {
-      if (!confirm('Delete this client?')) return;
+      if (!confirm('Delete this contract?')) return;
       const id = document.getElementById('clientId').value;
       try {
         await fetch('/.netlify/functions/applications', {
@@ -202,7 +194,7 @@
       }
     });
 
-    // === SOUMISSION FORMULAIRE CLIENT ===
+    // === SOUMISSION FORMULAIRE CONTRAT ===
     document.getElementById('clientForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       
@@ -247,47 +239,47 @@
     async function loadSubmissions() {
       try {
         const res = await fetch('/.netlify/functions/applications/submissions');
-        const subs = await res.json();
-        const listDiv = document.getElementById('submissionsList');
-        listDiv.innerHTML = subs.map(s => `
-          <div style="padding: 12px; border-bottom: 1px solid var(--border-color);">
-            <strong>${s.full_name}</strong> - ${s.email} (${s.nationality})
-            <div style="margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap;">
-              <button onclick="createContractFromSubmission(${s.id})" style="font-size:0.85rem;">Create Contract</button>
-              <button onclick="deleteSubmission(${s.id})" style="font-size:0.85rem; background:#ef4444; color:white;">Delete</button>
+        const submissions = await res.json();
+        const container = document.getElementById('submissionsList');
+        
+        if (submissions.length === 0) {
+          container.innerHTML = '<p>No submissions yet.</p>';
+          return;
+        }
+
+        container.innerHTML = submissions.map(s => `
+          <div style="background: var(--card-bg); padding: 16px; margin-bottom: 12px; border-radius: 8px; border: 1px solid var(--border-color);">
+            <strong>${s.full_name}</strong> • ${s.email}<br>
+            <small>${s.nationality} • ${s.request_type} • ${s.category}</small>
+            <div style="margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap;">
+              <button onclick="editSubmission(${s.id})" class="btn" style="font-size:0.85rem; padding:4px 10px;">Edit</button>
+              <button onclick="deleteSubmission(${s.id})" class="btn" style="font-size:0.85rem; padding:4px 10px; background:#ef4444;">Delete</button>
             </div>
           </div>
         `).join('');
       } catch (err) {
         console.error(err);
+        document.getElementById('submissionsList').innerHTML = '<p style="color:var(--error);">Failed to load.</p>';
       }
     }
 
-    async function createContractFromSubmission(id) {
-      if (!confirm('Create contract from this submission?')) return;
-      
+    async function editSubmission(id) {
+      const newName = prompt("Edit Full Name:");
+      const newEmail = prompt("Edit Email:");
+      if (!newName || !newEmail) return;
+
       try {
-        const res = await fetch('/.netlify/functions/applications/submissions');
-        const subs = await res.json();
-        const sub = subs.find(s => s.id == id);
-        
-        if (!sub) return alert('Submission not found');
-        
-        const response = await fetch('/.netlify/functions/applications/submissions', {
-          method: 'POST',
+        const res = await fetch('/.netlify/functions/applications/submissions', {
+          method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            ...sub,
-            submission_id: id
-          })
+          body: JSON.stringify({ id, full_name: newName, email: newEmail })
         });
-        
-        const result = await response.json();
-        alert(`✅ Contract created!\nReference: ${result.reference}`);
-        loadSubmissions();
-        loadClients();
+        if (res.ok) {
+          alert('Updated!');
+          loadSubmissions();
+        }
       } catch (err) {
-        alert('Failed to create contract');
+        alert('Update failed');
       }
     }
 
@@ -307,11 +299,11 @@
 
     // === ONGLETS ===
     function showSection(section) {
-      document.getElementById('manual-section').style.display = section === 'manual' ? 'block' : 'none';
+      document.getElementById('contracts-section').style.display = section === 'contracts' ? 'block' : 'none';
       document.getElementById('submissions-section').style.display = section === 'submissions' ? 'block' : 'none';
       
       if (section === 'submissions') loadSubmissions();
-      if (section === 'manual') loadClients();
+      if (section === 'contracts') loadClients();
     }
 
     // === THEME + MENU ===
