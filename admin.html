@@ -267,7 +267,7 @@
             <small>${s.nationality} • ${s.request_type} • ${s.category}</small>
             <div style="margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap;">
               <button onclick="createContractFromSubmission(${s.id})" class="btn" style="font-size:0.85rem; padding:4px 10px;">Create Contract</button>
-              <button onclick="deleteSubmission(${s.id})" class="btn" style="font-size:0.85rem; padding:4px 10px; background:#ef4444;">Delete</button>
+              <button onclick="deleteSubmission(${s.id})" class="btn" style="font-size:0.85rem; padding:4px 10px; background:#ef4444; color:white;">Delete</button>
             </div>
           </div>
         `).join('');
@@ -328,10 +328,27 @@
             <strong>${m.name}</strong> • ${m.email}<br>
             <p style="margin: 10px 0; color: var(--text-primary);">${m.message}</p>
             <small style="color: var(--gray);">${new Date(m.submitted_at).toLocaleString()}</small>
+            <div style="margin-top: 10px;">
+              <button onclick="deleteMessage(${m.id})" class="btn" style="font-size:0.85rem; padding:4px 10px; background:#ef4444; color:white;">Delete</button>
+            </div>
           </div>
         `).join('');
       } catch (err) {
         document.getElementById('messagesList').innerHTML = '<p style="color:var(--error);">Failed to load.</p>';
+      }
+    }
+
+    async function deleteMessage(id) {
+      if (!confirm('Delete this message?')) return;
+      try {
+        await fetch('/.netlify/functions/messages', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id })
+        });
+        loadMessages();
+      } catch (err) {
+        alert('Failed to delete message');
       }
     }
 
@@ -346,7 +363,7 @@
       if (section === 'messages') loadMessages();
     }
 
-    // === THEME + MENU ===
+    // === THEME ===
     document.addEventListener('DOMContentLoaded', () => {
       const toggle = document.getElementById('themeToggle');
       if (toggle) {
