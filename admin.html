@@ -37,6 +37,7 @@
       <div style="display: flex; gap: 10px; margin: 20px 0; flex-wrap: wrap;">
         <button onclick="showSection('contracts')" class="btn" style="padding:8px 16px;">Contracts</button>
         <button onclick="showSection('submissions')" class="btn" style="padding:8px 16px;">Submissions</button>
+        <button onclick="showSection('messages')" class="btn" style="padding:8px 16px;">Messages</button>
       </div>
 
       <!-- Section Contrats -->
@@ -56,6 +57,13 @@
               <option value="Algerian">Algerian</option>
               <option value="American">American</option>
               <option value="French">French</option>
+              <option value="German">German</option>
+              <option value="British">British</option>
+              <option value="Canadian">Canadian</option>
+              <option value="Italian">Italian</option>
+              <option value="Spanish">Spanish</option>
+              <option value="Moroccan">Moroccan</option>
+              <option value="Egyptian">Egyptian</option>
             </select>
             <div>
               <label style="font-size:0.85rem;margin-bottom:6px;display:block;color:var(--gray);">Date of Birth *</label>
@@ -75,6 +83,8 @@
             <option value="IT & Tech">IT & Technology</option>
             <option value="Healthcare">Healthcare</option>
             <option value="Education">Education</option>
+            <option value="Engineering">Engineering</option>
+            <option value="Business & Finance">Business & Finance</option>
           </select>
 
           <select id="duration" required>
@@ -88,6 +98,7 @@
             <option value="pending">En attente</option>
             <option value="validated">Validé</option>
             <option value="expired">Expiré</option>
+            <option value="rejected">Rejeté</option>
           </select>
 
           <textarea id="message" placeholder="Notes..." rows="2"></textarea>
@@ -108,6 +119,14 @@
       <div id="submissions-section" style="display:none;">
         <h3>Candidate Submissions</h3>
         <div id="submissionsList" style="margin-top: 15px;">
+          <p>Loading...</p>
+        </div>
+      </div>
+
+      <!-- Section Messages -->
+      <div id="messages-section" style="display:none;">
+        <h3>Contact Messages</h3>
+        <div id="messagesList" style="margin-top: 15px;">
           <p>Loading...</p>
         </div>
       </div>
@@ -137,7 +156,7 @@
       }
     });
 
-    // === CHARGEMENT DES CONTRATS ===
+    // === CONTRATS ===
     async function loadClients() {
       try {
         const res = await fetch('/.netlify/functions/applications');
@@ -154,7 +173,6 @@
       }
     }
 
-    // === ÉDITION CONTRAT ===
     window.editClient = async (id) => {
       try {
         const res = await fetch(`/.netlify/functions/applications?id=${id}`);
@@ -177,7 +195,6 @@
       }
     };
 
-    // === SUPPRESSION CONTRAT ===
     document.getElementById('deleteBtn').addEventListener('click', async () => {
       if (!confirm('Delete this contract?')) return;
       const id = document.getElementById('clientId').value;
@@ -194,7 +211,6 @@
       }
     });
 
-    // === SOUMISSION FORMULAIRE CONTRAT ===
     document.getElementById('clientForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       
@@ -235,51 +251,51 @@
       document.getElementById('deleteBtn').style.display = 'none';
     }
 
-    // === GESTION DES CANDIDATURES ===
+    // === CANDIDATURES ===
     async function loadSubmissions() {
       try {
         const res = await fetch('/.netlify/functions/applications/submissions');
-        const submissions = await res.json();
+        const subs = await res.json();
         const container = document.getElementById('submissionsList');
-        
-        if (submissions.length === 0) {
+        if (subs.length === 0) {
           container.innerHTML = '<p>No submissions yet.</p>';
           return;
         }
-
-        container.innerHTML = submissions.map(s => `
+        container.innerHTML = subs.map(s => `
           <div style="background: var(--card-bg); padding: 16px; margin-bottom: 12px; border-radius: 8px; border: 1px solid var(--border-color);">
             <strong>${s.full_name}</strong> • ${s.email}<br>
             <small>${s.nationality} • ${s.request_type} • ${s.category}</small>
             <div style="margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap;">
-              <button onclick="editSubmission(${s.id})" class="btn" style="font-size:0.85rem; padding:4px 10px;">Edit</button>
+              <button onclick="createContractFromSubmission(${s.id})" class="btn" style="font-size:0.85rem; padding:4px 10px;">Create Contract</button>
               <button onclick="deleteSubmission(${s.id})" class="btn" style="font-size:0.85rem; padding:4px 10px; background:#ef4444;">Delete</button>
             </div>
           </div>
         `).join('');
       } catch (err) {
-        console.error(err);
         document.getElementById('submissionsList').innerHTML = '<p style="color:var(--error);">Failed to load.</p>';
       }
     }
 
-    async function editSubmission(id) {
-      const newName = prompt("Edit Full Name:");
-      const newEmail = prompt("Edit Email:");
-      if (!newName || !newEmail) return;
-
+    async function createContractFromSubmission(id) {
+      if (!confirm('Create contract from this submission?')) return;
       try {
-        const res = await fetch('/.netlify/functions/applications/submissions', {
-          method: 'PUT',
+        const res = await fetch('/.netlify/functions/applications/submissions');
+        const subs = await res.json();
+        const sub = subs.find(s => s.id == id);
+        if (!sub) return alert('Not found');
+        
+        const response = await fetch('/.netlify/functions/applications/submissions', {
+          method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id, full_name: newName, email: newEmail })
+          body: JSON.stringify({ ...sub, submission_id: id })
         });
-        if (res.ok) {
-          alert('Updated!');
-          loadSubmissions();
-        }
+        
+        const result = await response.json();
+        alert(`✅ Contract created!\nReference: ${result.reference}`);
+        loadSubmissions();
+        loadClients();
       } catch (err) {
-        alert('Update failed');
+        alert('Failed to create contract');
       }
     }
 
@@ -297,13 +313,37 @@
       }
     }
 
+    // === MESSAGES ===
+    async function loadMessages() {
+      try {
+        const res = await fetch('/.netlify/functions/messages');
+        const messages = await res.json();
+        const container = document.getElementById('messagesList');
+        if (messages.length === 0) {
+          container.innerHTML = '<p>No messages yet.</p>';
+          return;
+        }
+        container.innerHTML = messages.map(m => `
+          <div style="background: var(--card-bg); padding: 16px; margin-bottom: 12px; border-radius: 8px; border: 1px solid var(--border-color);">
+            <strong>${m.name}</strong> • ${m.email}<br>
+            <p style="margin: 10px 0; color: var(--text-primary);">${m.message}</p>
+            <small style="color: var(--gray);">${new Date(m.submitted_at).toLocaleString()}</small>
+          </div>
+        `).join('');
+      } catch (err) {
+        document.getElementById('messagesList').innerHTML = '<p style="color:var(--error);">Failed to load.</p>';
+      }
+    }
+
     // === ONGLETS ===
     function showSection(section) {
       document.getElementById('contracts-section').style.display = section === 'contracts' ? 'block' : 'none';
       document.getElementById('submissions-section').style.display = section === 'submissions' ? 'block' : 'none';
+      document.getElementById('messages-section').style.display = section === 'messages' ? 'block' : 'none';
       
       if (section === 'submissions') loadSubmissions();
       if (section === 'contracts') loadClients();
+      if (section === 'messages') loadMessages();
     }
 
     // === THEME + MENU ===
@@ -319,12 +359,6 @@
           localStorage.setItem('theme', newTheme);
           toggle.textContent = newTheme === 'dark' ? '🌙' : '☀️';
         });
-      }
-
-      const menuToggle = document.getElementById('menuToggle');
-      const navMenu = document.getElementById('navMenu');
-      if (menuToggle && navMenu) {
-        menuToggle.addEventListener('click', () => navMenu.classList.toggle('active'));
       }
     });
   </script>
