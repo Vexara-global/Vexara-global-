@@ -408,6 +408,17 @@ async function deleteComment(id) {
     }
 
     // === ONGLETS ===
+function showSection(section) {
+  document.getElementById('contracts-section').style.display = section === 'contracts' ? 'block' : 'none';
+  document.getElementById('submissions-section').style.display = section === 'submissions' ? 'block' : 'none';
+  document.getElementById('messages-section').style.display = section === 'messages' ? 'block' : 'none';
+  document.getElementById('comments-section').style.display = section === 'comments' ? 'block' : 'none';
+  
+  if (section === 'submissions') loadSubmissions();
+  if (section === 'contracts') loadClients();
+  if (section === 'messages') loadMessages();
+  if (section === 'comments') loadCommentsAdmin(); // ← ajouté
+}
     function showSection(section) {
       document.getElementById('contracts-section').style.display = section === 'contracts' ? 'block' : 'none';
       document.getElementById('submissions-section').style.display = section === 'submissions' ? 'block' : 'none';
