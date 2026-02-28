@@ -8,12 +8,15 @@ const pool = new Pool({
 
 exports.handler = async () => {
   try {
-    const res = await pool.query(
-      'SELECT author_name, country, service_type, comment, rating, submitted_at FROM comments ORDER BY submitted_at DESC LIMIT 10'
-    );
+    const res = await pool.query(`
+      SELECT id, author_name, country, service_type, comment, rating, email, submitted_at
+      FROM comments
+      ORDER BY submitted_at DESC
+      LIMIT 10
+    `);
     return { statusCode: 200, body: JSON.stringify(res.rows) };
   } catch (err) {
-    console.error(err);
-    return { statusCode: 500, body: JSON.stringify({ error: "Load failed" }) };
+    console.error("DB Error:", err.message);
+    return { statusCode: 500, body: JSON.stringify({ error: "Database query failed", details: err.message }) };
   }
 };
