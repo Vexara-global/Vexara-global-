@@ -146,6 +146,49 @@
 </div>
 
   <script>
+
+// === Charger les commentaires (admin) ===
+async function loadCommentsAdmin() {
+  try {
+    const res = await fetch('/.netlify/functions/comments');
+    const comments = await res.json();
+    const container = document.getElementById('commentsAdminList');
+    
+    if (comments.length === 0) {
+      container.innerHTML = '<p>No reviews yet.</p>';
+      return;
+    }
+
+    container.innerHTML = comments.map(c => `
+      <div style="background: var(--card-bg); padding: 16px; margin-bottom: 12px; border-radius: 8px; border: 1px solid var(--border-color);">
+        <strong>${c.author_name}</strong> • ${c.country}<br>
+        <small>${c.service_type} • ${new Date(c.submitted_at).toLocaleString()}</small>
+        <p style="margin: 8px 0; color: var(--text-primary);">${c.comment}</p>
+        <div style="color: #f59e0b;">${'★'.repeat(c.rating)}${'☆'.repeat(5 - c.rating)}</div>
+        <div style="margin-top: 10px;">
+          <button onclick="deleteComment(${c.id})" class="btn" style="font-size:0.85rem; padding:4px 10px; background:#ef4444; color:white;">Delete</button>
+        </div>
+      </div>
+    `).join('');
+  } catch (err) {
+    document.getElementById('commentsAdminList').innerHTML = '<p style="color:var(--error);">Failed to load reviews.</p>';
+  }
+}
+
+// === Supprimer un commentaire ===
+async function deleteComment(id) {
+  if (!confirm('Delete this review?')) return;
+  try {
+    await fetch('/.netlify/functions/comments', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id })
+    });
+    loadCommentsAdmin();
+  } catch (err) {
+    alert('Failed to delete review');
+  }
+}
     // === LOGIN ===
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
