@@ -12,6 +12,133 @@
   <link rel="stylesheet" href="css/style.css" />
   <link rel="icon" href="image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>V</text></svg>">
 </head>
+<!-- === COMMENTS SECTION === -->
+<section id="comments" class="form-section" style="padding-top: 0;">
+  <div class="container">
+    <h2>What Our Clients Say</h2>
+    <p class="form-note">Real feedback from candidates who used Vexara Global.</p>
+
+    <!-- Liste des commentaires -->
+    <div id="comments-list" style="max-width: 800px; margin: 30px auto;">
+      <p>Loading...</p>
+    </div>
+
+    <!-- Formulaire -->
+    <div style="max-width: 600px; margin: 40px auto; padding: 24px; background: var(--card-bg); border-radius: 12px;">
+      <h3>Share Your Experience</h3>
+      <form id="commentForm" style="margin-top: 20px;">
+        <div class="form-row">
+          <input type="text" name="author_name" placeholder="Your Name *" required />
+          <input type="text" name="country" placeholder="Country *" required />
+        </div>
+
+        <select name="service_type" required>
+          <option value="">-- Service Type *</option>
+          <option value="job">Job</option>
+          <option value="internship">Internship</option>
+          <option value="language-stay">Language Stay</option>
+        </select>
+
+        <div style="margin: 12px 0;">
+          <label>Rating *</label><br>
+          <span id="rating-stars" style="font-size: 24px; cursor: pointer;">★★★★★</span>
+          <input type="hidden" name="rating" id="rating-input" value="5" />
+        </div>
+
+        <textarea name="comment" placeholder="Your feedback (min. 20 characters) *" rows="4" minlength="20" required></textarea>
+
+        <button type="submit" class="btn primary" style="margin-top: 16px;">Submit Review</button>
+        <div id="comment-result" style="margin-top: 12px; font-size: 0.9rem;"></div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<script>
+// === Gestion des étoiles ===
+document.addEventListener('DOMContentLoaded', () => {
+  const starsEl = document.getElementById('rating-stars');
+  const input = document.getElementById('rating-input');
+
+  let rating = 5;
+  updateStars(rating);
+  starsEl.addEventListener('click', (e) => {
+    const target = e.target;
+    if (target.tagName === 'SPAN') {
+      const text = target.textContent;
+      rating = text.split('★').length - 1;
+      updateStars(rating);
+      input.value = rating;
+    }
+  });
+
+  function updateStars(r) {
+    starsEl.innerHTML = '★'.repeat(r) + '☆'.repeat(5 - r);
+  }
+
+  // === Soumission du commentaire ===
+  document.getElementById('commentForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const resultDiv = document.getElementById('comment-result');
+    resultDiv.innerHTML = '<span style="color:var(--gray);">Submitting...</span>';
+
+    try {
+      const res = await fetch('/.netlify/functions/save-comment', {
+        method: 'POST',
+        body: new URLSearchParams(formData)
+      });
+
+      if (res.ok) {
+        resultDiv.innerHTML = '<span style="color:#10b981;">✅ Thank you! Your review is live.</span>';
+        e.target.reset();
+        updateStars(5);
+        loadComments(); // recharger la liste
+      } else {
+        throw new Error('Failed');
+      }
+    } catch (err) {
+      resultDiv.innerHTML = '<span style="color:#ef4444;">❌ Failed to submit. Please try again.</span>';
+    }
+  });
+
+  // === Charger les commentaires ===
+  async function loadComments() {
+    try {
+      const res = await fetch('/.netlify/functions/public-comments');
+      const comments = await res.json();
+      const container = document.getElementById('comments-list');
+
+      if (comments.length === 0) {
+        container.innerHTML = '<p>No reviews yet. Be the first!</p>';        return;
+      }
+
+      container.innerHTML = comments.map(c => `
+        <div style="background: var(--card-bg); padding: 24px; margin-bottom: 20px; border-radius: 12px; border: 1px solid var(--border-color);">
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+            <div style="width: 48px; height: 48px; background: #2563eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
+              ${c.author_name.charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <strong>${c.author_name}</strong> — ${c.country}<br>
+              <small>${c.service_type} • ${new Date(c.submitted_at).toLocaleDateString()}</small>
+            </div>
+          </div>
+          <p style="margin: 0; color: var(--text-primary);">${c.comment}</p>
+          <div style="margin-top: 8px; color: #f59e0b;">
+            ${'★'.repeat(c.rating)}${'☆'.repeat(5 - c.rating)}
+          </div>
+        </div>
+      `).join('');
+    } catch (err) {
+      document.getElementById('comments-list').innerHTML = '<p>Failed to load reviews.</p>';
+    }
+  }
+
+  // Charger au chargement
+  loadComments();
+});
+</script>
 <body>
   <header>
     <div class="container">
