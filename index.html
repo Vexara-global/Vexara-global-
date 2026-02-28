@@ -1,143 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Favicon -->
-<link rel="icon" type="image/x-icon" href="/favicon.ico">
-<!-- Optionnel : support moderne (PNG) -->
-<link rel="apple-touch-icon" href="/favicon.png" sizes="180x180">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta name="description" content="Vexara Global — International job, internship & language stay platform in 90+ countries. No registration required." />
   <title>Vexara Global | International Opportunities</title>
   <link rel="stylesheet" href="css/style.css" />
-  <link rel="icon" href="image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>V</text></svg>">
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/favicon.png" sizes="180x180">
 </head>
-</section>
-<!-- === COMMENTS SECTION === -->
-<section id="comments" class="form-section" style="padding-top: 0;">
-  <div class="container">
-    <h2>What Our Clients Say</h2>
-    <p class="form-note">Real feedback from candidates who used Vexara Global.</p>
-
-    <!-- Liste des commentaires -->
-    <div id="comments-list" style="max-width: 800px; margin: 30px auto;">
-      <p>Loading...</p>
-    </div>
-
-    <!-- Formulaire -->
-    <div style="max-width: 600px; margin: 40px auto; padding: 24px; background: var(--card-bg); border-radius: 12px;">
-      <h3>Share Your Experience</h3>
-      <form id="commentForm" style="margin-top: 20px;">
-        <div class="form-row">
-          <input type="text" name="author_name" placeholder="Your Name *" required />
-          <input type="text" name="country" placeholder="Country *" required />
-        </div>
-
-        <select name="service_type" required>
-          <option value="">-- Service Type *</option>
-          <option value="job">Job</option>
-          <option value="internship">Internship</option>
-          <option value="language-stay">Language Stay</option>
-        </select>
-
-        <div style="margin: 12px 0;">
-          <label>Rating *</label><br>
-          <span id="rating-stars" style="font-size: 24px; cursor: pointer;">★★★★★</span>
-          <input type="hidden" name="rating" id="rating-input" value="5" />
-        </div>
-
-        <textarea name="comment" placeholder="Your feedback (min. 20 characters) *" rows="4" minlength="20" required></textarea>
-
-        <button type="submit" class="btn primary" style="margin-top: 16px;">Submit Review</button>
-        <div id="comment-result" style="margin-top: 12px; font-size: 0.9rem;"></div>
-      </form>
-    </div>
-  </div>
-<script>
-// === Gestion des étoiles ===
-document.addEventListener('DOMContentLoaded', () => {
-  const starsEl = document.getElementById('rating-stars');
-  const input = document.getElementById('rating-input');
-
-  let rating = 5;
-  updateStars(rating);
-  starsEl.addEventListener('click', (e) => {
-    const target = e.target;
-    if (target.tagName === 'SPAN') {
-      const text = target.textContent;
-      rating = text.split('★').length - 1;
-      updateStars(rating);
-      input.value = rating;
-    }
-  });
-
-  function updateStars(r) {
-    starsEl.innerHTML = '★'.repeat(r) + '☆'.repeat(5 - r);
-  }
-
-  // === Soumission du commentaire ===
-  document.getElementById('commentForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    const resultDiv = document.getElementById('comment-result');
-    resultDiv.innerHTML = '<span style="color:var(--gray);">Submitting...</span>';
-
-    try {
-      const res = await fetch('/.netlify/functions/save-comment', {
-        method: 'POST',
-        body: new URLSearchParams(formData)
-      });
-
-      if (res.ok) {
-        resultDiv.innerHTML = '<span style="color:#10b981;">✅ Thank you! Your review is live.</span>';
-        e.target.reset();
-        updateStars(5);
-        loadComments(); // recharger la liste
-      } else {
-        throw new Error('Failed');
-      }
-    } catch (err) {
-      resultDiv.innerHTML = '<span style="color:#ef4444;">❌ Failed to submit. Please try again.</span>';
-    }
-  });
-
-  // === Charger les commentaires ===
-  async function loadComments() {
-    try {
-      const res = await fetch('/.netlify/functions/public-comments');
-      const comments = await res.json();
-      const container = document.getElementById('comments-list');
-
-      if (comments.length === 0) {
-        container.innerHTML = '<p>No reviews yet. Be the first!</p>';        return;
-      }
-
-      container.innerHTML = comments.map(c => `
-        <div style="background: var(--card-bg); padding: 24px; margin-bottom: 20px; border-radius: 12px; border: 1px solid var(--border-color);">
-          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-            <div style="width: 48px; height: 48px; background: #2563eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
-              ${c.author_name.charAt(0).toUpperCase()}
-            </div>
-            <div>
-              <strong>${c.author_name}</strong> — ${c.country}<br>
-              <small>${c.service_type} • ${new Date(c.submitted_at).toLocaleDateString()}</small>
-            </div>
-          </div>
-          <p style="margin: 0; color: var(--text-primary);">${c.comment}</p>
-          <div style="margin-top: 8px; color: #f59e0b;">
-            ${'★'.repeat(c.rating)}${'☆'.repeat(5 - c.rating)}
-          </div>
-        </div>
-      `).join('');
-    } catch (err) {
-      document.getElementById('comments-list').innerHTML = '<p>Failed to load reviews.</p>';
-    }
-  }
-
-  // Charger au chargement
-  loadComments();
-});
-</script>
 <body>
   <header>
     <div class="container">
@@ -175,8 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   <section class="values">
     <div class="container">
-      <h2>Why thousands of candidates trust us</h2>
-      <div class="cards">
+      <h2>Why thousands of candidates trust us</h2>      <div class="cards">
         <div class="card">
           <h3>✅ Full Transparency</h3>
           <p>Submit once, get a reference, and track your application securely.</p>
@@ -193,6 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
   </section>
 
+  <!-- === SUBMISSION FORM === -->
   <section id="apply" class="form-section">
     <div class="container">
       <h2>Submit Your Request in 60 Seconds</h2>
@@ -205,6 +77,12 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
 
         <div class="form-row">
+          <input type="text" name="address" placeholder="Residential Address *" required />
+          <input type="text" name="city" placeholder="City *" required />
+        </div>
+
+        <div class="form-row">
+          <input type="text" name="postal_code" placeholder="Postal Code *" required />
           <select name="nationality" required>
             <option value="">-- Nationality *</option>
             <option value="Algerian">Algerian</option>
@@ -218,8 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <option value="Moroccan">Moroccan</option>
             <option value="Egyptian">Egyptian</option>
             <option value="Tunisian">Tunisian</option>
-            <option value="Nigerian">Nigerian</option>
-            <option value="South African">South African</option>
+            <option value="Nigerian">Nigerian</option>            <option value="South African">South African</option>
             <option value="Indian">Indian</option>
             <option value="Chinese">Chinese</option>
             <option value="Japanese">Japanese</option>
@@ -254,11 +131,11 @@ document.addEventListener('DOMContentLoaded', () => {
             <option value="Filipino">Filipino</option>
             <option value="Singaporean">Singaporean</option>
           </select>
-          
-          <div>
-            <label style="font-size:0.85rem;margin-bottom:6px;display:block;color:var(--gray);">Date of Birth *</label>
-            <input type="date" name="dob" required />
-          </div>
+        </div>
+
+        <div>
+          <label style="font-size:0.85rem;margin-bottom:6px;display:block;color:var(--gray);">Date of Birth *</label>
+          <input type="date" name="dob" required />
         </div>
 
         <select name="request_type" required>
@@ -268,8 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <option value="language-stay">Language Stay</option>
         </select>
 
-        <select name="category" required>
-          <option value="">-- Category *</option>
+        <select name="category" required>          <option value="">-- Category *</option>
           <option value="IT & Tech">IT & Technology</option>
           <option value="Healthcare">Healthcare & Medicine</option>
           <option value="Education">Education & Teaching</option>
@@ -300,55 +176,49 @@ document.addEventListener('DOMContentLoaded', () => {
       </form>
     </div>
   </section>
-<!-- === COMMENTS SECTION === -->
-<section id="comments" class="form-section" style="padding-top: 0;">
-  <div class="container">
-    <h2>What Our Clients Say</h2>
-    <p class="form-note">Real feedback from candidates who used Vexara Global.</p>
 
-    <div style="max-width: 800px; margin: 30px auto;">
-      <!-- Comment 1 -->
-      <div style="background: var(--card-bg); padding: 24px; margin-bottom: 20px; border-radius: 12px; border: 1px solid var(--border-color);">
-        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-          <div style="width: 48px; height: 48px; background: #2563eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">A</div>
-          <div>
-            <strong>Ahmed B.</strong> — Algeria<br>
-            <small>Internship in Germany • 2025</small>
-          </div>
-        </div>
-        <p style="margin: 0; color: var(--text-primary);">"The process was smooth and transparent. I received my reference within 2 hours, and the team responded to all my questions quickly."</p>
+  <!-- === COMMENTS SECTION (entre apply et contact) === -->
+  <section id="comments" class="form-section" style="padding-top: 0;">
+    <div class="container">
+      <h2>What Our Clients Say</h2>
+      <p class="form-note">Real feedback from candidates who used Vexara Global.</p>
+
+      <div id="comments-list" style="max-width: 800px; margin: 30px auto;">
+        <p>Loading...</p>
       </div>
 
-      <!-- Comment 2 -->
-      <div style="background: var(--card-bg); padding: 24px; margin-bottom: 20px; border-radius: 12px; border: 1px solid var(--border-color);">
-        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-          <div style="width: 48px; height: 48px; background: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">S</div>
-          <div>
-            <strong>Sarah K.</strong> — Canada<br>
-            <small>Language Stay in France • 2025</small>
+      <!-- Formulaire de commentaire -->
+      <div style="max-width: 600px; margin: 40px auto; padding: 24px; background: var(--card-bg); border-radius: 12px;">
+        <h3>Share Your Experience</h3>
+        <form id="commentForm" style="margin-top: 20px;">
+          <div class="form-row">
+            <input type="text" name="author_name" placeholder="Your Name *" required />
+            <input type="text" name="country" placeholder="Country *" required />
           </div>
-        </div>
-        <p style="margin: 0; color: var(--text-primary);">"No registration, no stress — just submit, wait 48h, and you’re on your way. Highly recommended!"</p>
-      </div>
+          <input type="email" name="email" placeholder="Your Email *" required />
 
-      <!-- Comment 3 -->
-      <div style="background: var(--card-bg); padding: 24px; margin-bottom: 20px; border-radius: 12px; border: 1px solid var(--border-color);">
-        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-          <div style="width: 48px; height: 48px; background: #7c3aed; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">M</div>
-          <div>
-            <strong>Mohamed T.</strong> — Morocco<br>
-            <small>Job in Spain • 2024</small>
+          <select name="service_type" required>
+            <option value="">-- Service Type *</option>
+            <option value="job">Job</option>
+            <option value="internship">Internship</option>
+            <option value="language-stay">Language Stay</option>
+          </select>
+
+          <div style="margin: 12px 0;">
+            <label>Rating *</label><br>
+            <span id="rating-stars" style="font-size: 24px; cursor: pointer;">★★★★★</span>
+            <input type="hidden" name="rating" id="rating-input" value="5" />
           </div>
-        </div>
-        <p style="margin: 0; color: var(--text-primary);">"I was skeptical at first, but everything was real — contract, support, follow-up. Thank you Vexara Global!"</p>
+
+          <textarea name="comment" placeholder="Your feedback (min. 20 characters) *" rows="4" minlength="20" required></textarea>
+
+          <button type="submit" class="btn primary" style="margin-top: 16px;">Submit Review</button>
+          <div id="comment-result" style="margin-top: 12px; font-size: 0.9rem;"></div>
+        </form>
       </div>
     </div>
+  </section>
 
-    <div style="text-align: center; margin-top: 30px;">
-      <a href="#contact" class="btn">Share Your Experience</a>
-    </div>
-  </div>
-</section>
   <!-- === CONTACT SECTION === -->
   <section id="contact" class="form-section" style="padding-top: 0;">
     <div class="container">
@@ -357,10 +227,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       <div style="max-width: 800px; margin: 30px auto; background: var(--card-bg); padding: 30px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
         <div style="display: flex; flex-wrap: wrap; gap: 30px;">
-          <!-- Informations de contact -->
           <div style="flex: 1; min-width: 250px;">
             <h3 style="margin-bottom: 20px; color: var(--primary);">Get in Touch</h3>
-            
             <div style="margin-bottom: 20px; display: flex; align-items: flex-start; gap: 12px;">
               <span>📧</span>
               <div>
@@ -368,36 +236,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p><a href="mailto:vexaraglobal@gmail.com" style="color: var(--primary); text-decoration: none;">vexaraglobal@gmail.com</a></p>
               </div>
             </div>
-
             <div style="margin-bottom: 20px; display: flex; align-items: flex-start; gap: 12px;">
               <span>📨</span>
               <div>
                 <p><strong>Requests & Support</strong></p>
                 <p><a href="mailto:requests.vexaraglobal@gmail.com" style="color: var(--primary); text-decoration: none;">requests.vexaraglobal@gmail.com</a></p>
-                <p style="font-size: 0.9rem; color: var(--gray); margin-top: 4px;">
-                  For applications, complaints, or status checks.
-                </p>
+                <p style="font-size: 0.9rem; color: var(--gray); margin-top: 4px;">For applications, complaints, or status checks.</p>
               </div>
-            </div>
-
-            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--border-color);">
-              <p style="font-size: 0.95rem; color: var(--gray);">
-                🌍 We operate in <strong>90+ countries</strong>.<br>
-                🕒 Response within <strong>48 business hours</strong>.
-              </p>
+            </div>            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+              <p style="font-size: 0.95rem; color: var(--gray);">🌍 We operate in <strong>90+ countries</strong>.<br>🕒 Response within <strong>48 business hours</strong>.</p>
             </div>
           </div>
 
-          <!-- Formulaire rapide -->
           <div style="flex: 1; min-width: 250px;">
             <h3 style="margin-bottom: 20px; color: var(--primary);">Send a Message</h3>
             <form id="quickContactForm" style="display: flex; flex-direction: column; gap: 12px;">
-              <input type="text" name="name" placeholder="Your Name" required 
-                     style="padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--input-bg); color: var(--text-primary);" />
-              <input type="email" name="email" placeholder="Your Email" required 
-                     style="padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--input-bg); color: var(--text-primary);" />
-              <textarea name="message" placeholder="Your Message" rows="4" required 
-                        style="padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--input-bg); color: var(--text-primary);"></textarea>
+              <input type="text" name="name" placeholder="Your Name" required style="padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--input-bg); color: var(--text-primary);" />
+              <input type="email" name="email" placeholder="Your Email" required style="padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--input-bg); color: var(--text-primary);" />
+              <textarea name="message" placeholder="Your Message" rows="4" required style="padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--input-bg); color: var(--text-primary);"></textarea>
               <button type="submit" class="btn" style="align-self: flex-start;">Send Message</button>
               <div id="contact-result" style="font-size: 0.9rem; margin-top: 8px;"></div>
             </form>
@@ -409,13 +265,84 @@ document.addEventListener('DOMContentLoaded', () => {
 
   <footer>
     <div class="container">
-      <p>&copy; 2023 Vexara Global — International platform for professional and educational opportunities.</p>
+      <p>
+        &copy; 2026 Vexara Global — International platform for professional and educational opportunities.<br>
+        <a href="terms.html" style="color: inherit; text-decoration: underline;">Terms & Conditions</a>
+      </p>
     </div>
   </footer>
 
+  <!-- SCRIPTS -->
   <script>
-    // Formulaire principal
-    document.getElementById('submissionForm').addEventListener('submit', async (e) => {
+    // === COMMENTAIRE : masquer l'email (ex: vex******l@gmail.com)
+    function maskEmail(email) {
+      if (!email.includes('@')) return email;
+      const [name, domain] = email.split('@');
+      if (name.length <= 2) return email;
+      const masked = name[0] + '*'.repeat(name.length - 2) + name[name.length - 1];
+      return `${masked}@${domain}`;
+    }
+
+    // === Charger les commentaires (avec email masqué)
+    async function loadComments() {
+      try {
+        const res = await fetch('/.netlify/functions/public-comments');
+        const comments = await res.json();
+        const container = document.getElementById('comments-list');
+
+        if (comments.length === 0) {
+          container.innerHTML = '<p>No reviews yet. Be the first!</p>';
+          return;        }
+
+        container.innerHTML = comments.map(c => `
+          <div style="background: var(--card-bg); padding: 24px; margin-bottom: 20px; border-radius: 12px; border: 1px solid var(--border-color);">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+              <div style="width: 48px; height: 48px; background: #2563eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
+                ${c.author_name.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <strong>${c.author_name}</strong> — ${maskEmail(c.email)}<br>
+                <small>${c.service_type} • ${new Date(c.submitted_at).toLocaleDateString()}</small>
+              </div>
+            </div>
+            <p style="margin: 0; color: var(--text-primary);">${c.comment}</p>
+            <div style="margin-top: 8px; color: #f59e0b;">
+              ${'★'.repeat(c.rating)}${'☆'.repeat(5 - c.rating)}
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        document.getElementById('comments-list').innerHTML = '<p>Failed to load reviews.</p>';
+      }
+    }
+
+    // === Soumission du commentaire
+    document.getElementById('commentForm')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const resultDiv = document.getElementById('comment-result');
+      resultDiv.innerHTML = '<span style="color:var(--gray);">Submitting...</span>';
+
+      try {
+        const res = await fetch('/.netlify/functions/save-comment', {
+          method: 'POST',
+          body: new URLSearchParams(formData)
+        });
+
+        if (res.ok) {
+          resultDiv.innerHTML = '<span style="color:#10b981;">✅ Thank you! Your review is live.</span>';
+          e.target.reset();
+          document.getElementById('rating-input').value = '5';
+          loadComments();
+        } else {
+          throw new Error('Failed');
+        }
+      } catch (err) {
+        resultDiv.innerHTML = '<span style="color:#ef4444;">❌ Failed to submit. Please try again.</span>';
+      }
+    });
+    // === Formulaire principal
+    document.getElementById('submissionForm')?.addEventListener('submit', async (e) => {
       e.preventDefault();
       const formData = new FormData(e.target);
       const resultDiv = document.getElementById('form-result');
@@ -444,8 +371,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Formulaire de contact
-    document.getElementById('quickContactForm').addEventListener('submit', async (e) => {
+    // === Formulaire de contact
+    document.getElementById('quickContactForm')?.addEventListener('submit', async (e) => {
       e.preventDefault();
       const formData = new FormData(e.target);
       const resultDiv = document.getElementById('contact-result');
@@ -463,12 +390,11 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
           throw new Error('Failed to send');
         }
-      } catch (err) {
-        resultDiv.innerHTML = '<span style="color:#ef4444;">❌ Failed to send. Please try again.</span>';
+      } catch (err) {        resultDiv.innerHTML = '<span style="color:#ef4444;">❌ Failed to send. Please try again.</span>';
       }
     });
 
-    // Theme toggle + mobile menu
+    // === Theme toggle
     document.addEventListener('DOMContentLoaded', () => {
       const toggle = document.getElementById('themeToggle');
       if (toggle) {
@@ -488,6 +414,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (menuToggle && navMenu) {
         menuToggle.addEventListener('click', () => navMenu.classList.toggle('active'));
       }
+
+      // Charger les commentaires au démarrage
+      loadComments();
     });
   </script>
 </body>
