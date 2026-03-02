@@ -11,7 +11,7 @@
   <link rel="apple-touch-icon" href="/favicon.png" sizes="180x180">
 </head>
 <body>
-  <!-- ✅ UN SEUL HEADER, EN HAUT -->
+  <!-- ✅ UNIQUE HEADER -->
   <header>
     <div class="container">
       <div style="display: flex; align-items: center; gap: 12px;">
@@ -27,6 +27,7 @@
         <li><a href="index.html">Home</a></li>
         <li><a href="check.html">Check My Contract</a></li>
         <li><a href="reviews.html">Reviews</a></li>
+        <li><a href="#how-we-help">How We Help</a></li>
         <li><a href="#contact">Contact</a></li>
       </ul>
     </div>
@@ -47,7 +48,7 @@
     </div>
   </section>
 
-  <section class="values">
+  <section class="">
     <div class="container">
       <h2>Why thousands of candidates trust us</h2>
       <div class="cards">
@@ -182,6 +183,50 @@
     </div>
   </section>
 
+  <!-- === HOW WE HELP SECTION === -->
+  <section id="how-we-help" class="form-section" style="padding-top: 0;">
+    <div class="container">
+      <h2>How We Help You Succeed Abroad</h2>
+      <p class="form-note">We don’t just connect — we guide, verify, and secure your international opportunity.</p>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-top: 40px;">
+        <!-- Step 1 -->
+        <div style="background: var(--card-bg); padding: 30px; border-radius: 16px; border: 1px solid var(--border-color);">
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+            <div style="width: 48px; height: 48px; background: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">1</div>
+            <h3>Submit Once, Track Forever</h3>
+          </div>
+          <p>You send your request once — no account, no login. We generate a unique reference code (e.g. VX-2026-789) that lets you track your application securely, 24/7.</p>
+        </div>
+
+        <!-- Step 2 -->
+        <div style="background: var(--card-bg); padding: 30px; border-radius: 16px; border: 1px solid var(--border-color);">
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+            <div style="width: 48px; height: 48px; background: #3b82f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">2</div>
+            <h3>Verified Opportunities Only</h3>
+          </div>
+          <p>We partner only with trusted institutions, companies, and language schools across 90+ countries. Every offer is pre-vetted — no scams, no fake listings.</p>
+        </div>
+
+        <!-- Step 3 -->
+        <div style="background: var(--card-bg); padding: 30px; border-radius: 16px; border: 1px solid var(--border-color);">
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+            <div style="width: 48px; height: 48px; background: #8b5cf6; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">3</div>
+            <h3>Full Support, Zero Stress</h3>
+          </div>
+          <p>From submission to contract signing, our team guides you — email support within 48h, document review, and status updates. You focus on preparing; we handle the rest.</p>
+        </div>
+      </div>
+
+      <div style="margin-top: 50px; text-align: center;">
+        <p style="font-size: 1.1rem; color: var(--text-primary); margin-bottom: 20px;">
+          🌍 Over 12,000 candidates trusted us in 2025 — and 94% received their opportunity within 30 days.
+        </p>
+        <a href="#apply" class="btn primary">Start Your Journey Today</a>
+      </div>
+    </div>
+  </section>
+
   <!-- === LINK TO REVIEWS === -->
   <section class="form-section" style="padding-top: 0;">
     <div class="container" style="text-align: center; padding: 40px 0;">
@@ -302,7 +347,7 @@
       }
     });
 
-    // Theme toggle + mobile menu
+    // Theme + mobile menu
     document.addEventListener('DOMContentLoaded', () => {
       const toggle = document.getElementById('themeToggle');
       if (toggle) {
