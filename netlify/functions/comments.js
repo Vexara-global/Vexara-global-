@@ -1,0 +1,31 @@
+// netlify/functions/comments.js
+const { Pool } = require('pg');
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
+});
+
+exports.handler = async (event) => {
+  try {
+    const method = event.httpMethod;
+
+    if (method === 'GET') {
+      const res = await pool.query(
+        'SELECT id, author_name, country, service_type, comment, rating, submitted_at FROM reviews WHERE is_approved = true ORDER BY submitted_at DESC'
+      );
+      return { statusCode: 200, body: JSON.stringify(res.rows) };
+    }
+
+    if (method === 'DELETE') {
+      const data = JSON.parse(event.body);
+      await pool.query('DELETE FROM reviews WHERE id = $1', [data.id]);
+      return { statusCode: 200, body: '{}' };
+    }
+
+    return { statusCode: 405, body: 'Method not allowed' };
+  } catch (err) {
+    console.error('Comments API error:', err.message);
+    return { statusCode: 500, body: JSON.stringify({ error: "Database error", details: err.message }) };
+  }
+};
